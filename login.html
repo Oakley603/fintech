@@ -1,0 +1,205 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<!-- 让页面在手机上全屏运行，隐藏浏览器的地址栏和底部工具栏 -->
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+<!-- 设置在手机桌面显示的图标 (如果你有图标的话) -->
+<link rel="apple-touch-icon" href="icon.png">
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>FXGuard - Login</title>
+    <!-- 引入 Tailwind CSS (通过 CDN 直接在浏览器运行) -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    <!-- 引入 Lucide 图标库 -->
+    <script src="https://unpkg.com/lucide@latest"></script>
+</head>
+
+<!-- 移动端专属底部导航 -->
+<div class="lg:hidden fixed bottom-0 left-0 right-0 bg-white border-t border-gray-200 px-6 py-3 flex justify-between items-center z-50">
+    <a href="dashboard.html" class="flex flex-col items-center text-[#0a2463]">
+        <i data-lucide="layout-dashboard" class="w-6 h-6"></i>
+        <span class="text-[10px] mt-1 font-bold">Home</span>
+    </a>
+    <a href="data-input.html" class="flex flex-col items-center text-gray-400">
+        <i data-lucide="plus-circle" class="w-6 h-6"></i>
+        <span class="text-[10px] mt-1">New Risk</span>
+    </a>
+    <a href="risk-report.html" class="flex flex-col items-center text-gray-400">
+        <i data-lucide="file-text" class="w-6 h-6"></i>
+        <span class="text-[10px] mt-1">Report</span>
+    </a>
+    <a href="login.html" class="flex flex-col items-center text-gray-400">
+        <i data-lucide="user" class="w-6 h-6"></i>
+        <span class="text-[10px] mt-1">Profile</span>
+    </a>
+</div>
+
+<!-- 记得在原本的脚本里加一行重新渲染图标的逻辑 -->
+<script>lucide.createIcons();</script>
+
+<body class="min-h-screen bg-white flex text-gray-900 font-sans">
+
+    <!-- 左侧：品牌展示区 (仅在大屏幕显示) -->
+    <div class="hidden lg:flex lg:w-1/2 bg-gradient-to-br from-[#0a2463] to-[#1e3a8a] items-center justify-center p-12">
+        <div class="max-w-md text-white">
+            <div class="flex items-center gap-3 mb-8">
+                <div class="w-16 h-16 bg-white flex items-center justify-center rounded-md">
+                    <i data-lucide="trending-up" class="w-10 h-10 text-[#0a2463]"></i>
+                </div>
+                <div>
+                    <h1 class="text-3xl font-bold">FXGuard</h1>
+                    <p class="text-blue-200">Foreign Exchange Risk Management</p>
+                </div>
+            </div>
+            
+            <h2 class="text-4xl font-bold mb-6">
+                Protect Your Business from Exchange Rate Volatility
+            </h2>
+            
+            <p class="text-lg text-blue-100 mb-8">
+                Smart hedging strategies for small and micro-enterprises. Minimize risk, maximize returns.
+            </p>
+            
+            <div class="space-y-4">
+                <div class="flex items-start gap-3">
+                    <i data-lucide="shield" class="w-6 h-6 text-blue-300 flex-shrink-0 mt-1"></i>
+                    <div>
+                        <h3 class="font-semibold text-lg mb-1">Real-time Risk Analysis</h3>
+                        <p class="text-blue-200">Get instant insights into your exchange rate exposure</p>
+                    </div>
+                </div>
+                <div class="flex items-start gap-3">
+                    <i data-lucide="shield" class="w-6 h-6 text-blue-300 flex-shrink-0 mt-1"></i>
+                    <div>
+                        <h3 class="font-semibold text-lg mb-1">AI-Powered Recommendations</h3>
+                        <p class="text-blue-200">Receive personalized hedging strategies based on your risk profile</p>
+                    </div>
+                </div>
+                <div class="flex items-start gap-3">
+                    <i data-lucide="shield" class="w-6 h-6 text-blue-300 flex-shrink-0 mt-1"></i>
+                    <div>
+                        <h3 class="font-semibold text-lg mb-1">Professional Grade Tools</h3>
+                        <p class="text-blue-200">Enterprise-level risk management, simplified for SMEs</p>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- 右侧：登录表单区 -->
+    <div class="flex-1 flex items-center justify-center p-8">
+        <div class="w-full max-w-md">
+            <!-- 移动端 Logo (仅在小屏幕显示) -->
+            <div class="lg:hidden flex items-center gap-3 mb-8">
+                <div class="w-12 h-12 bg-[#0a2463] flex items-center justify-center rounded-md">
+                    <i data-lucide="trending-up" class="w-8 h-8 text-white"></i>
+                </div>
+                <div>
+                    <h1 class="text-2xl font-bold text-[#0a2463]">FXGuard</h1>
+                    <p class="text-sm text-gray-600">FX Risk Management</p>
+                </div>
+            </div>
+
+            <div class="mb-8">
+                <h2 class="text-3xl font-bold text-[#0a2463] mb-2">Welcome Back</h2>
+                <p class="text-gray-600">Sign in to manage your exchange rate risk</p>
+            </div>
+
+            <form id="loginForm" class="space-y-6">
+                <!-- 账号输入 -->
+                <div class="space-y-2">
+                    <label for="account" class="text-[#0a2463] font-semibold block text-sm">Account</label>
+                    <input type="text" id="account" placeholder="Enter your account" required
+                        class="w-full h-12 px-3 border-2 border-gray-300 rounded-md focus:border-[#0a2463] focus:outline-none transition-colors">
+                </div>
+
+                <!-- 密码输入 -->
+                <div class="space-y-2">
+                    <label for="password" class="text-[#0a2463] font-semibold block text-sm">Password</label>
+                    <input type="password" id="password" placeholder="Enter your password" required
+                        class="w-full h-12 px-3 border-2 border-gray-300 rounded-md focus:border-[#0a2463] focus:outline-none transition-colors">
+                </div>
+
+                <!-- 货币选择 (替换了原本复杂的 Select 组件，使用原生 select) -->
+                <div class="space-y-2">
+                    <label for="currency" class="text-[#0a2463] font-semibold block text-sm">Settlement Currency</label>
+                    <select id="currency" required
+                        class="w-full h-12 px-3 border-2 border-gray-300 rounded-md focus:border-[#0a2463] focus:outline-none bg-white transition-colors cursor-pointer">
+                        <option value="" disabled selected>Select your currency</option>
+                        <option value="CNY">CNY - Chinese Yuan Renminbi</option>
+                        <option value="MYR">MYR - Malaysian Ringgit</option>
+                        <option value="THB">THB - Thai Baht</option>
+                        <option value="IDR">IDR - Indonesian Rupiah</option>
+                        <option value="VND">VND - Vietnamese Dong</option>
+                        <option value="SGD">SGD - Singapore Dollar</option>
+                        <option value="PHP">PHP - Philippine Peso</option>
+                        <option value="EUR">EUR - Euro</option>
+                        <option value="GBP">GBP - British Pound</option>
+                    </select>
+                </div>
+
+                <!-- 记住我 & 忘记密码 -->
+                <div class="flex items-center justify-between">
+                    <div class="flex items-center">
+                        <input type="checkbox" id="remember" class="w-4 h-4 border-2 border-gray-300 rounded cursor-pointer accent-[#0a2463]">
+                        <label for="remember" class="ml-2 text-sm text-gray-600 cursor-pointer">Remember me</label>
+                    </div>
+                    <a href="#" class="text-sm text-[#0a2463] font-semibold hover:underline">Forgot password?</a>
+                </div>
+
+                <!-- 按钮 -->
+                <button type="submit"
+                    class="w-full h-12 bg-[#0a2463] hover:bg-[#1e3a8a] text-white font-semibold rounded-md transition-colors flex items-center justify-center">
+                    Login
+                </button>
+
+                <button type="button" id="freeTrialBtn"
+                    class="w-full h-12 border-2 border-[#0a2463] text-[#0a2463] hover:bg-[#0a2463] hover:text-white font-semibold rounded-md transition-colors flex items-center justify-center">
+                    Start Free Trial
+                </button>
+            </form>
+
+            <div class="mt-8 text-center">
+                <p class="text-sm text-gray-600">
+                    Don't have an account? 
+                    <a href="register.html" class="text-[#0a2463] font-semibold hover:underline cursor-pointer">Register now</a>
+                </p>
+            </div>
+        </div>
+    </div>
+
+    <!-- 交互逻辑 -->
+    <script>
+        lucide.createIcons();
+
+        document.getElementById('loginForm').addEventListener('submit', function(e) {
+            e.preventDefault(); 
+            
+            // 获取用户当前输入的账号
+            const inputAccount = document.getElementById('account').value;
+            // 获取浏览器缓存里刚才注册的账号
+            const savedAccount = localStorage.getItem("registeredAccount");
+            
+            // 【核心新增】判断逻辑：如果缓存里有账号，且和输入的一致
+            if (savedAccount && inputAccount === savedAccount) {
+                const currency = document.getElementById('currency').value;
+                localStorage.setItem("preferredCurrency", currency);
+                
+                alert('Login successful! Redirecting to Dashboard...');
+                // 账号匹配，直接进入仪表盘
+                window.location.href = './dashboard.html';
+            } else {
+                // 账号不存在或输入错误
+                alert('Account not found or incorrect. Please register first!');
+                // 引导去注册页
+                window.location.href = './register.html';
+            }
+        });
+
+        document.getElementById('freeTrialBtn').addEventListener('click', function() {
+            window.location.href = './register.html';
+        });
+    </script>
+</body>
+</html>

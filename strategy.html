@@ -1,0 +1,311 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<!-- 让页面在手机上全屏运行，隐藏浏览器的地址栏和底部工具栏 -->
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+<!-- 设置在手机桌面显示的图标 (如果你有图标的话) -->
+<link rel="apple-touch-icon" href="icon.png">
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>FXGuard - Strategy Recommendation</title>
+    <!-- 引入 Tailwind CSS -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    <!-- 引入 Lucide 图标库 -->
+    <script src="https://unpkg.com/lucide@latest"></script>
+</head>
+
+<!-- 移动端专属底部导航 -->
+<div class="lg:hidden fixed bottom-0 left-0 right-0 bg-white border-t border-gray-200 px-6 py-3 flex justify-between items-center z-50">
+    <a href="dashboard.html" class="flex flex-col items-center text-[#0a2463]">
+        <i data-lucide="layout-dashboard" class="w-6 h-6"></i>
+        <span class="text-[10px] mt-1 font-bold">Home</span>
+    </a>
+    <a href="data-input.html" class="flex flex-col items-center text-gray-400">
+        <i data-lucide="plus-circle" class="w-6 h-6"></i>
+        <span class="text-[10px] mt-1">New Risk</span>
+    </a>
+    <a href="risk-report.html" class="flex flex-col items-center text-gray-400">
+        <i data-lucide="file-text" class="w-6 h-6"></i>
+        <span class="text-[10px] mt-1">Report</span>
+    </a>
+    <a href="login.html" class="flex flex-col items-center text-gray-400">
+        <i data-lucide="user" class="w-6 h-6"></i>
+        <span class="text-[10px] mt-1">Profile</span>
+    </a>
+</div>
+
+<!-- 记得在原本的脚本里加一行重新渲染图标的逻辑 -->
+<script>lucide.createIcons();</script>
+<body class="min-h-screen bg-white text-gray-900 font-sans">
+
+    <!-- 顶部导航栏 -->
+    <div class="bg-[#0a2463] text-white">
+        <div class="container mx-auto px-6 py-4">
+            <div class="flex items-center gap-3">
+                <div class="w-10 h-10 bg-white flex items-center justify-center rounded-sm">
+                    <i data-lucide="trending-up" class="w-6 h-6 text-[#0a2463]"></i>
+                </div>
+                <div>
+                    <h1 class="text-xl font-bold">FXGuard</h1>
+                    <p class="text-xs text-blue-200">FX Risk Management</p>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- 主体内容 -->
+    <div class="container mx-auto px-6 py-12 max-w-5xl">
+        <a href="risk-report.html" class="flex items-center gap-2 text-[#0a2463] font-semibold mb-6 hover:underline inline-flex">
+            <i data-lucide="arrow-left" class="w-5 h-5"></i>
+            Back
+        </a>
+
+        <!-- 进度指示器 -->
+        <div class="flex items-center gap-4 mb-12">
+            <div class="flex items-center gap-2">
+                <div class="w-8 h-8 bg-[#0a2463] text-white flex items-center justify-center font-bold rounded-sm">✓</div>
+                <span class="font-semibold text-[#0a2463]">Data Input</span>
+            </div>
+            <div class="h-0.5 w-12 bg-[#0a2463]"></div>
+            <div class="flex items-center gap-2">
+                <div class="w-8 h-8 bg-[#0a2463] text-white flex items-center justify-center font-bold rounded-sm">✓</div>
+                <span class="font-semibold text-[#0a2463]">Risk Report</span>
+            </div>
+            <div class="h-0.5 w-12 bg-[#0a2463]"></div>
+            <div class="flex items-center gap-2">
+                <div class="w-8 h-8 bg-[#0a2463] text-white flex items-center justify-center font-bold rounded-sm">3</div>
+                <span class="font-semibold text-[#0a2463]">Strategy</span>
+            </div>
+        </div>
+
+        <div class="mb-8">
+            <h1 class="text-4xl font-bold text-[#0a2463] mb-3">Recommended Hedging Strategy</h1>
+            <p class="text-gray-600 text-lg">
+                Based on your risk profile and market conditions, here's our AI-powered recommendation
+            </p>
+        </div>
+
+        <!-- 建议对冲比例卡片 -->
+        <div class="bg-gradient-to-r from-[#0a2463] to-[#1e3a8a] text-white p-10 mb-8 rounded-sm shadow-md">
+            <div class="flex items-center gap-4 mb-6">
+                <div class="w-16 h-16 bg-white flex items-center justify-center rounded-sm">
+                    <i data-lucide="shield" class="w-10 h-10 text-[#0a2463]"></i>
+                </div>
+                <div>
+                    <h2 class="text-3xl font-bold">Suggested Hedging Ratio</h2>
+                    <p class="text-blue-200">Optimal balance between protection and opportunity</p>
+                </div>
+            </div>
+            <div class="flex items-baseline gap-4 mb-4">
+                <span id="ratioDisplay" class="text-8xl font-bold">--%</span>
+                <div>
+                    <p class="text-2xl font-semibold">of total exposure</p>
+                    <p class="text-blue-200 text-lg"><span id="hedgedAmountDisplay">--</span> <span class="currency-label">MYR</span> protected</p>
+                </div>
+            </div>
+            
+            <!-- 原生进度条 -->
+            <div class="bg-white/10 p-4 mt-6 rounded-sm">
+                <div class="w-full h-4 bg-gray-300 rounded-full mb-2 overflow-hidden">
+                    <div id="ratioProgressBar" class="h-full bg-green-400" style="width: 0%;"></div>
+                </div>
+                <div class="flex justify-between text-sm">
+                    <span><span id="hedgedBarText">--</span> <span class="currency-label">MYR</span> Locked</span>
+                    <span><span id="unhedgedBarText">--</span> <span class="currency-label">MYR</span> Floating</span>
+                </div>
+            </div>
+        </div>
+
+        <!-- 解释原因 -->
+        <div class="bg-blue-50 border-2 border-[#0a2463] p-8 mb-8 rounded-sm">
+            <h3 class="text-2xl font-bold text-[#0a2463] mb-4">Why <span id="whyRatioText">--</span>%?</h3>
+            <div class="grid md:grid-cols-3 gap-6">
+                <div class="bg-white p-6 border border-gray-200 rounded-sm">
+                    <div class="w-12 h-12 bg-green-100 flex items-center justify-center mb-3 rounded-full">
+                        <i data-lucide="shield" class="w-6 h-6 text-green-600"></i>
+                    </div>
+                    <h4 class="font-bold text-[#0a2463] mb-2">Protection</h4>
+                    <p class="text-sm text-gray-600">
+                        Locks in rates for <span id="protectRatioText">--</span>% of exposure, ensuring predictable cash flow.
+                    </p>
+                </div>
+                <div class="bg-white p-6 border border-gray-200 rounded-sm">
+                    <div class="w-12 h-12 bg-yellow-100 flex items-center justify-center mb-3 rounded-full">
+                        <i data-lucide="target" class="w-6 h-6 text-yellow-600"></i>
+                    </div>
+                    <h4 class="font-bold text-[#0a2463] mb-2">Flexibility</h4>
+                    <p class="text-sm text-gray-600">
+                        Keeps <span id="flexRatioText">--</span>% floating to benefit from favorable rate movements.
+                    </p>
+                </div>
+                <div class="bg-white p-6 border border-gray-200 rounded-sm">
+                    <div class="w-12 h-12 bg-blue-100 flex items-center justify-center mb-3 rounded-full">
+                        <i data-lucide="trending-up" class="w-6 h-6 text-blue-600"></i>
+                    </div>
+                    <h4 class="font-bold text-[#0a2463] mb-2">Optimized</h4>
+                    <p id="optimizedText" class="text-sm text-gray-600">
+                        Based on your risk tolerance and market volatility.
+                    </p>
+                </div>
+            </div>
+        </div>
+
+        <!-- 推荐操作步骤 -->
+        <div class="border-2 border-gray-300 p-8 mb-8 rounded-sm">
+            <h2 class="text-2xl font-bold text-[#0a2463] mb-6">
+                Recommended Operation Steps
+            </h2>
+            
+            <div class="space-y-6">
+                <!-- 步骤 1: 贴合产品定位的描述 -->
+                <div class="flex gap-6">
+                    <div class="flex-shrink-0">
+                        <div class="w-12 h-12 bg-[#0a2463] text-white flex items-center justify-center font-bold text-xl rounded-sm">1</div>
+                    </div>
+                    <div class="flex-1">
+                        <h3 class="text-xl font-bold text-[#0a2463] mb-2">
+                            Execute Partial Settlement
+                        </h3>
+                        <p class="text-gray-700 mb-3">
+                            Convert and lock in the current exchange rate for <span id="step1Hedged">--</span> <span class="currency-label font-bold">MYR</span> (<span id="step1Ratio">--</span>% of exposure).
+                        </p>
+                        <div class="bg-gray-100 p-4 rounded-sm border-l-4 border-[#0a2463]">
+                            <p class="text-sm font-semibold text-gray-700 mb-1">Action Required:</p>
+                            <p class="text-sm text-gray-600">Execute settlement via platforms like Wise, PingPong, or Payoneer to secure the current rate immediately.</p>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="border-t-2 border-gray-200"></div>
+
+                <!-- 步骤 2 -->
+                <div class="flex gap-6">
+                    <div class="flex-shrink-0">
+                        <div class="w-12 h-12 bg-[#0a2463] text-white flex items-center justify-center font-bold text-xl rounded-sm">2</div>
+                    </div>
+                    <div class="flex-1">
+                        <h3 class="text-xl font-bold text-[#0a2463] mb-2">
+                            Monitor Remaining Exposure
+                        </h3>
+                        <p class="text-gray-700 mb-3">
+                            Track exchange rate movements for the remaining <span id="step2Unhedged">--</span> <span class="currency-label font-bold">MYR</span> (<span id="step2Ratio">--</span>% of exposure).
+                        </p>
+                        <div class="bg-gray-100 p-4 rounded-sm border-l-4 border-[#0a2463]">
+                            <p class="text-sm font-semibold text-gray-700 mb-1">Action Required:</p>
+                            <p class="text-sm text-gray-600">Set up rate alerts for favorable conversion opportunities over the next <span id="step2Days">30</span> days.</p>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- 预期结果 -->
+        <div class="bg-green-50 border-2 border-green-500 p-8 mb-8 rounded-sm">
+            <div class="flex items-center gap-3 mb-4">
+                <i data-lucide="check-circle-2" class="w-8 h-8 text-green-600"></i>
+                <h3 class="text-2xl font-bold text-green-800">Expected Results</h3>
+            </div>
+            <ul class="space-y-3 text-gray-700">
+                <li class="flex items-start gap-3">
+                    <span class="text-green-600 font-bold text-xl mt-1">✓</span>
+                    <span><strong>Guaranteed minimum:</strong> <span id="resultRatio">--</span>% of exposure is protected from depreciation.</span>
+                </li>
+                <li class="flex items-start gap-3">
+                    <span class="text-green-600 font-bold text-xl mt-1">✓</span>
+                    <span><strong>Upside potential:</strong> Remaining <span id="resultUnhedged">--</span>% can benefit if rates improve.</span>
+                </li>
+                <li class="flex items-start gap-3">
+                    <span class="text-green-600 font-bold text-xl mt-1">✓</span>
+                    <span><strong>Business certainty:</strong> Predictable cash flow for inventory and operational planning.</span>
+                </li>
+            </ul>
+        </div>
+
+        <!-- 确认按钮 -->
+        <button id="confirmBtn" class="w-full h-16 bg-[#0a2463] hover:bg-[#1e3a8a] text-white font-bold text-xl rounded-md transition-colors shadow-lg">
+            Acknowledge & Return to Dashboard
+        </button>
+
+        <!-- 新增：对冲成本透明化提示 -->
+        <div class="mt-4 text-center">
+            <p class="text-[#0a2463] font-semibold bg-blue-50 inline-block px-4 py-2 rounded-full border border-blue-200">
+                Estimated hedging cost: approximately <span id="costRatioDisplay">--</span>% of your total exposure (<span id="costAmountDisplay">--</span> <span class="currency-label">MYR</span>)
+            </p>
+        </div>
+
+        <!-- 修正后的免责声明 -->
+        <p class="text-center text-sm text-gray-500 mt-3">
+            This recommendation is based on statistical models. Results may vary.
+        </p>
+
+    <!-- 交互逻辑 -->
+    <script>
+        lucide.createIcons();
+
+        // 获取本地存储数据
+        const unsettledAmount = parseFloat(localStorage.getItem("unsettledAmount")) || 100000;
+        const settlementPeriod = localStorage.getItem("settlementPeriod") || "30";
+        const riskTolerance = parseInt(localStorage.getItem("riskTolerance")) || 50;
+        const preferredCurrency = localStorage.getItem("preferredCurrency") || "MYR";
+        
+        // 动态计算对冲比例
+        let hedgingRatio = 70; 
+        let profileText = "Balanced";
+        
+        if (riskTolerance < 33) {
+            hedgingRatio = 90; 
+            profileText = "Conservative";
+        } else if (riskTolerance >= 67) {
+            hedgingRatio = 30; 
+            profileText = "Aggressive";
+        }
+
+        const unhedgedRatio = 100 - hedgingRatio;
+        // 计算时直接使用输入的金额（现在统一理解为目标货币金额）
+        const hedgedAmount = unsettledAmount * (hedgingRatio / 100);
+        const unhedgedAmount = unsettledAmount - hedgedAmount;
+
+        // 统一更新货币单位
+        document.querySelectorAll('.currency-label').forEach(el => {
+            el.textContent = preferredCurrency;
+        });
+
+        // 填充页面数据
+        document.getElementById('ratioDisplay').textContent = hedgingRatio + '%';
+        document.getElementById('hedgedAmountDisplay').textContent = hedgedAmount.toLocaleString(undefined, {maximumFractionDigits: 0});
+// 假设第三方平台（如 Wise/PingPong）的换汇/对冲手续费约为对冲金额的 0.5%
+        // 将其换算为占“总敞口”的百分比，以及具体金额
+        const platformFeeRate = 0.005;
+        const estimatedCostRatio = (hedgingRatio * platformFeeRate).toFixed(2); 
+        const estimatedCostAmount = (hedgedAmount * platformFeeRate);
+        
+        document.getElementById('costRatioDisplay').textContent = estimatedCostRatio;
+        document.getElementById('costAmountDisplay').textContent = estimatedCostAmount.toLocaleString(undefined, {maximumFractionDigits: 0});
+        
+        document.getElementById('ratioProgressBar').style.width = hedgingRatio + '%';
+        document.getElementById('hedgedBarText').textContent = hedgedAmount.toLocaleString(undefined, {maximumFractionDigits: 0});
+        document.getElementById('unhedgedBarText').textContent = unhedgedAmount.toLocaleString(undefined, {maximumFractionDigits: 0});
+
+        document.getElementById('whyRatioText').textContent = hedgingRatio;
+        document.getElementById('protectRatioText').textContent = hedgingRatio;
+        document.getElementById('flexRatioText').textContent = unhedgedRatio;
+        document.getElementById('optimizedText').textContent = `Based on your ${profileText} risk tolerance setting.`;
+
+        document.getElementById('step1Hedged').textContent = hedgedAmount.toLocaleString(undefined, {maximumFractionDigits: 0});
+        document.getElementById('step1Ratio').textContent = hedgingRatio;
+        
+        document.getElementById('step2Unhedged').textContent = unhedgedAmount.toLocaleString(undefined, {maximumFractionDigits: 0});
+        document.getElementById('step2Ratio').textContent = unhedgedRatio;
+        document.getElementById('step2Days').textContent = settlementPeriod;
+
+        document.getElementById('resultRatio').textContent = hedgingRatio;
+        document.getElementById('resultUnhedged').textContent = unhedgedRatio;
+
+        // 确认按钮交互
+        document.getElementById('confirmBtn').addEventListener('click', function() {
+            window.location.href = 'dashboard.html';
+        });
+    </script>
+</body>
+</html>

@@ -1,0 +1,286 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<!-- 让页面在手机上全屏运行，隐藏浏览器的地址栏和底部工具栏 -->
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+<!-- 设置在手机桌面显示的图标 (如果你有图标的话) -->
+<link rel="apple-touch-icon" href="icon.png">
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>FXGuard - Risk Report</title>
+    <!-- 引入 Tailwind CSS -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    <!-- 引入 Lucide 图标库 -->
+    <script src="https://unpkg.com/lucide@latest"></script>
+    <!-- 引入 Chart.js -->
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+</head>
+
+<!-- 移动端专属底部导航 -->
+<div class="lg:hidden fixed bottom-0 left-0 right-0 bg-white border-t border-gray-200 px-6 py-3 flex justify-between items-center z-50">
+    <a href="dashboard.html" class="flex flex-col items-center text-[#0a2463]">
+        <i data-lucide="layout-dashboard" class="w-6 h-6"></i>
+        <span class="text-[10px] mt-1 font-bold">Home</span>
+    </a>
+    <a href="data-input.html" class="flex flex-col items-center text-gray-400">
+        <i data-lucide="plus-circle" class="w-6 h-6"></i>
+        <span class="text-[10px] mt-1">New Risk</span>
+    </a>
+    <a href="risk-report.html" class="flex flex-col items-center text-gray-400">
+        <i data-lucide="file-text" class="w-6 h-6"></i>
+        <span class="text-[10px] mt-1">Report</span>
+    </a>
+    <a href="login.html" class="flex flex-col items-center text-gray-400">
+        <i data-lucide="user" class="w-6 h-6"></i>
+        <span class="text-[10px] mt-1">Profile</span>
+    </a>
+</div>
+
+<!-- 记得在原本的脚本里加一行重新渲染图标的逻辑 -->
+<script>lucide.createIcons();</script>
+<body class="min-h-screen bg-white text-gray-900 font-sans">
+
+    <!-- 顶部导航栏 -->
+    <div class="bg-[#0a2463] text-white">
+        <div class="container mx-auto px-6 py-4">
+            <div class="flex items-center gap-3">
+                <div class="w-10 h-10 bg-white flex items-center justify-center rounded-sm">
+                    <i data-lucide="trending-up" class="w-6 h-6 text-[#0a2463]"></i>
+                </div>
+                <div>
+                    <h1 class="text-xl font-bold">FXGuard</h1>
+                    <p class="text-xs text-blue-200">FX Risk Management</p>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- 主体内容 -->
+    <div class="container mx-auto px-6 py-12 max-w-6xl">
+        <a href="data-input.html" class="flex items-center gap-2 text-[#0a2463] font-semibold mb-6 hover:underline inline-flex">
+            <i data-lucide="arrow-left" class="w-5 h-5"></i>
+            Back
+        </a>
+
+        <!-- 进度指示器 -->
+        <div class="flex items-center gap-4 mb-12">
+            <div class="flex items-center gap-2">
+                <div class="w-8 h-8 bg-[#0a2463] text-white flex items-center justify-center font-bold rounded-sm">
+                    ✓
+                </div>
+                <span class="font-semibold text-[#0a2463]">Data Input</span>
+            </div>
+            <div class="h-0.5 w-12 bg-[#0a2463]"></div>
+            <div class="flex items-center gap-2">
+                <div class="w-8 h-8 bg-[#0a2463] text-white flex items-center justify-center font-bold rounded-sm">
+                    2
+                </div>
+                <span class="font-semibold text-[#0a2463]">Risk Report</span>
+            </div>
+            <div class="h-0.5 w-12 bg-gray-300"></div>
+            <div class="flex items-center gap-2">
+                <div class="w-8 h-8 border-2 border-gray-300 text-gray-400 flex items-center justify-center font-bold rounded-sm">
+                    3
+                </div>
+                <span class="text-gray-400">Strategy</span>
+            </div>
+        </div>
+
+        <div class="mb-8">
+            <h1 class="text-4xl font-bold text-[#0a2463] mb-3">Risk Analysis Report</h1>
+            <p class="text-gray-600 text-lg">
+                Based on your inputs, here's your current exchange rate risk exposure
+            </p>
+        </div>
+
+        <!-- 当前风险敞口 -->
+        <div class="bg-[#0a2463] text-white p-8 mb-8 rounded-sm shadow-md">
+            <div class="flex items-center gap-3 mb-4">
+                <i data-lucide="alert-triangle" class="w-8 h-8"></i>
+                <h2 class="text-2xl font-bold">Current Risk Exposure</h2>
+            </div>
+            <div class="flex items-baseline gap-3">
+                <span id="exposureAmount" class="text-6xl font-bold">--</span>
+                <span class="text-3xl currency-label">RMB</span>
+            </div>
+            <p class="text-blue-200 mt-2 text-lg">
+                Based on your pending settlement of <span id="localAmount">--</span> <span class="currency-label">MYR</span>
+            </p>
+        </div>
+
+        <!-- 汇率波动预测图表 -->
+        <div class="bg-white border-2 border-gray-200 p-8 mb-8 rounded-sm">
+           <h2 class="text-2xl font-bold text-[#0a2463] mb-6">
+                30-Day Market Value Fluctuation (<span class="currency-label">MYR</span>)
+            </h2>
+            <div class="w-full h-[400px]">
+                <canvas id="predictionChart"></canvas>
+            </div>
+        </div>
+
+        <!-- 情景模拟 -->
+        <div class="grid md:grid-cols-2 gap-6 mb-8">
+            <!-- 立即结算 -->
+            <div class="border-2 border-[#0a2463] bg-blue-50 p-8 rounded-sm">
+                <div class="flex items-center gap-3 mb-4">
+                    <div class="w-12 h-12 bg-[#0a2463] flex items-center justify-center rounded-sm">
+                        <i data-lucide="trending-up" class="w-7 h-7 text-white"></i>
+                    </div>
+                    <h3 class="text-2xl font-bold text-[#0a2463]">Settle Now</h3>
+                </div>
+                <div class="mb-4">
+                    <p class="text-gray-600 mb-2 text-lg">Guaranteed to receive:</p>
+                    <div class="flex items-baseline gap-2">
+                        <span id="guaranteedAmount" class="text-5xl font-bold text-[#0a2463]">--</span>
+                        <span class="text-2xl text-gray-600 currency-label">RMB</span>
+                    </div>
+                </div>
+                <div class="bg-white border border-[#0a2463] p-4 rounded-sm">
+                    <p class="font-semibold text-[#0a2463]">✓ Zero exchange rate risk</p>
+                    <p class="text-sm text-gray-600 mt-1">Lock in the current rate with certainty</p>
+                </div>
+            </div>
+
+            <!-- 等待结算 -->
+            <div class="border-2 border-amber-500 bg-amber-50 p-8 rounded-sm">
+                <div class="flex items-center gap-3 mb-4">
+                    <div class="w-12 h-12 bg-amber-500 flex items-center justify-center rounded-sm">
+                        <i data-lucide="alert-triangle" class="w-7 h-7 text-white"></i>
+                    </div>
+                    <h3 class="text-2xl font-bold text-amber-700">Wait <span id="waitDays">30</span> Days</h3>
+                </div>
+                <div class="space-y-4 mb-4">
+                    <div>
+                        <p class="text-gray-600 mb-1 flex items-center gap-2">
+                            <i data-lucide="trending-up" class="w-5 h-5 text-green-600"></i>
+                            <span class="font-semibold">Best Case Scenario:</span>
+                        </p>
+                        <div class="flex items-baseline gap-2">
+                            <span id="potentialGain" class="text-3xl font-bold text-green-600">--</span>
+                            <span class="text-xl text-gray-600 currency-label">RMB</span>
+                        </div>
+                    </div>
+                    <div>
+                        <p class="text-gray-600 mb-1 flex items-center gap-2">
+                            <i data-lucide="trending-down" class="w-5 h-5 text-red-600"></i>
+                            <span class="font-semibold">Worst Case Scenario:</span>
+                        </p>
+                        <div class="flex items-baseline gap-2">
+                            <span id="potentialLoss" class="text-3xl font-bold text-red-600">--</span>
+                            <span class="text-xl text-gray-600 currency-label">RMB</span>
+                        </div>
+                    </div>
+                </div>
+                <div class="bg-white border border-amber-500 p-4 rounded-sm">
+                    <p class="font-semibold text-amber-700">⚠ High uncertainty</p>
+                    <p class="text-sm text-gray-600 mt-1">Market volatility creates risk</p>
+                </div>
+            </div>
+        </div>
+
+        <!-- 摘要盒子 -->
+        <div class="bg-gray-100 border-2 border-gray-300 p-8 mb-8 rounded-sm">
+            <h3 class="text-xl font-bold text-[#0a2463] mb-4">Risk Summary</h3>
+            <ul class="space-y-2 text-gray-700">
+                <li class="flex items-start gap-2">
+                    <span class="text-[#0a2463] font-bold mt-1">•</span>
+                    <span>Your <strong id="summaryLocal">--</strong> <span class="currency-label">MYR</span> exposure represents significant exchange rate risk.</span>
+                </li>
+                <li class="flex items-start gap-2">
+                    <span class="text-[#0a2463] font-bold mt-1">•</span>
+                    <span>Waiting could result in gains up to <strong id="summaryGain">--</strong> <span class="currency-label"></span> or losses up to <strong id="summaryLoss">--</strong> <span class="currency-label"></span>.</span>
+                </li>
+                <li class="flex items-start gap-2">
+                    <span class="text-[#0a2463] font-bold mt-1">•</span>
+                    <span>Recommended: Consider a hedging strategy to protect your business from adverse rate movements.</span>
+                </li>
+            </ul>
+        </div>
+
+        <button id="strategyBtn" class="w-full h-14 bg-[#0a2463] hover:bg-[#1e3a8a] text-white font-bold text-lg rounded-md transition-colors flex items-center justify-center">
+            View Recommended Strategy
+            <i data-lucide="arrow-right" class="w-5 h-5 ml-2"></i>
+        </button>
+    </div>
+
+    <!-- 交互逻辑 -->
+    <script>
+        // 初始化 Lucide 图标
+        lucide.createIcons();
+
+        // 1. 从 localStorage 读取数据（如果没有则使用默认测试数据）
+        const unsettledAmount = parseFloat(localStorage.getItem("unsettledAmount")) || 100000;
+        const settlementPeriod = localStorage.getItem("settlementPeriod") || "30";
+        const preferredCurrency = localStorage.getItem("preferredCurrency") || "MYR";
+        
+        // 设置基础汇率模拟
+        let baseRate = 4.85; 
+        if(preferredCurrency === 'CNY') baseRate = 7.25;
+        if(preferredCurrency === 'THB') baseRate = 36.50;
+
+       // 2. 执行计算逻辑 (直接以用户输入的本币为基准)
+        const currentExposure = unsettledAmount; 
+        const potentialGain = unsettledAmount * 0.03; // 假设最高 3% 收益
+        const potentialLoss = unsettledAmount * 0.02; // 假设最高 2% 亏损
+
+        // 3. 将计算结果更新到页面中
+        document.querySelectorAll('.currency-label').forEach(el => el.textContent = preferredCurrency);
+        document.getElementById('exposureAmount').textContent = currentExposure.toLocaleString(undefined, {maximumFractionDigits: 0});
+        document.getElementById('localAmount').textContent = unsettledAmount.toLocaleString();
+        
+        document.getElementById('guaranteedAmount').textContent = currentExposure.toLocaleString(undefined, {maximumFractionDigits: 0});
+        document.getElementById('waitDays').textContent = settlementPeriod;
+        
+        document.getElementById('potentialGain').textContent = "+" + potentialGain.toLocaleString(undefined, {maximumFractionDigits: 0});
+        document.getElementById('potentialLoss').textContent = "-" + potentialLoss.toLocaleString(undefined, {maximumFractionDigits: 0});
+
+        document.getElementById('summaryLocal').textContent = unsettledAmount.toLocaleString();
+        document.getElementById('summaryGain').textContent = potentialGain.toLocaleString(undefined, {maximumFractionDigits: 0});
+        document.getElementById('summaryLoss').textContent = potentialLoss.toLocaleString(undefined, {maximumFractionDigits: 0});
+
+        // 4. 绘制 Chart.js 预测图表 (转换为金额波动图)
+        const labels = ['Day 0', 'Day 5', 'Day 10', 'Day 15', 'Day 20', 'Day 25', 'Day 30'];
+        const baseAmount = unsettledAmount;
+        // 模拟金额的上下波动
+        const rateData = [baseAmount, baseAmount * 0.99, baseAmount * 1.01, baseAmount * 0.995, baseAmount * 1.015, baseAmount, baseAmount * 1.02];
+        const highData = rateData.map(r => r * 1.01); 
+        const lowData = rateData.map(r => r * 0.99);  
+        const currentLine = rateData.map(() => baseAmount);
+
+        const ctx = document.getElementById('predictionChart').getContext('2d');
+        new Chart(ctx, {
+            type: 'line',
+            data: {
+                labels: labels,
+                datasets: [
+                    { label: 'High Range', data: highData, borderColor: '#ef4444', borderWidth: 2, pointRadius: 0, tension: 0.3 },
+                    { label: 'Expected Value', data: rateData, borderColor: '#0a2463', borderWidth: 3, tension: 0.3 },
+                    { label: 'Low Range', data: lowData, borderColor: '#10b981', borderWidth: 2, pointRadius: 0, tension: 0.3 },
+                    { label: 'Current Value', data: currentLine, borderColor: '#0a2463', borderWidth: 1, borderDash: [5, 5], pointRadius: 0 }
+                ]
+            },
+            options: {
+                responsive: true,
+                maintainAspectRatio: false,
+                interaction: { mode: 'index', intersect: false },
+                plugins: {
+                    tooltip: { backgroundColor: '#fff', titleColor: '#000', bodyColor: '#666', borderColor: '#0a2463', borderWidth: 2 }
+                },
+                scales: {
+                    x: { grid: { borderDash: [3, 3], color: '#e5e7eb' } },
+                    y: {
+                        title: { display: true, text: `Market Value (${preferredCurrency})` },
+                        grid: { borderDash: [3, 3], color: '#e5e7eb' }
+                    }
+                }
+            }
+        });
+
+        // 5. 跳转到最后一页
+        document.getElementById('strategyBtn').addEventListener('click', function() {
+            window.location.href = 'strategy.html';
+        });
+    </script>
+</body>
+</html>

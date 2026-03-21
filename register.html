@@ -1,0 +1,220 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<!-- 让页面在手机上全屏运行，隐藏浏览器的地址栏和底部工具栏 -->
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+<!-- 设置在手机桌面显示的图标 (如果你有图标的话) -->
+<link rel="apple-touch-icon" href="icon.png">
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>FXGuard - Register</title>
+    <!-- 引入 Tailwind CSS -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    <!-- 引入 Lucide 图标库 -->
+    <script src="https://unpkg.com/lucide@latest"></script>
+</head>
+
+<!-- 移动端专属底部导航 -->
+<div class="lg:hidden fixed bottom-0 left-0 right-0 bg-white border-t border-gray-200 px-6 py-3 flex justify-between items-center z-50">
+    <a href="dashboard.html" class="flex flex-col items-center text-[#0a2463]">
+        <i data-lucide="layout-dashboard" class="w-6 h-6"></i>
+        <span class="text-[10px] mt-1 font-bold">Home</span>
+    </a>
+    <a href="data-input.html" class="flex flex-col items-center text-gray-400">
+        <i data-lucide="plus-circle" class="w-6 h-6"></i>
+        <span class="text-[10px] mt-1">New Risk</span>
+    </a>
+    <a href="risk-report.html" class="flex flex-col items-center text-gray-400">
+        <i data-lucide="file-text" class="w-6 h-6"></i>
+        <span class="text-[10px] mt-1">Report</span>
+    </a>
+    <a href="login.html" class="flex flex-col items-center text-gray-400">
+        <i data-lucide="user" class="w-6 h-6"></i>
+        <span class="text-[10px] mt-1">Profile</span>
+    </a>
+</div>
+
+<!-- 记得在原本的脚本里加一行重新渲染图标的逻辑 -->
+<script>lucide.createIcons();</script>
+
+<body class="min-h-screen bg-white flex text-gray-900 font-sans">
+
+    <!-- 左侧：品牌展示区 (仅在大屏幕显示) -->
+    <div class="hidden lg:flex lg:w-1/2 bg-gradient-to-br from-[#0a2463] to-[#1e3a8a] items-center justify-center p-12">
+        <div class="max-w-md text-white">
+            <div class="flex items-center gap-3 mb-8">
+                <div class="w-16 h-16 bg-white flex items-center justify-center rounded-md">
+                    <i data-lucide="trending-up" class="w-10 h-10 text-[#0a2463]"></i>
+                </div>
+                <div>
+                    <h1 class="text-3xl font-bold">FXGuard</h1>
+                    <p class="text-blue-200">Foreign Exchange Risk Management</p>
+                </div>
+            </div>
+            
+            <h2 class="text-4xl font-bold mb-6">
+                Join Thousands of E-Commerce Sellers
+            </h2>
+            
+            <p class="text-lg text-blue-100 mb-8">
+                Protect your cross-border profits from exchange rate volatility. Smart hedging made simple.
+            </p>
+            
+            <div class="space-y-4">
+                <div class="flex items-start gap-3">
+                    <i data-lucide="shield" class="w-6 h-6 text-blue-300 flex-shrink-0 mt-1"></i>
+                    <div>
+                        <h3 class="font-semibold text-lg mb-1">Multi-Currency Support</h3>
+                        <p class="text-blue-200">Support for MYR, THB, IDR, VND, and major currencies</p>
+                    </div>
+                </div>
+                <div class="flex items-start gap-3">
+                    <i data-lucide="shield" class="w-6 h-6 text-blue-300 flex-shrink-0 mt-1"></i>
+                    <div>
+                        <h3 class="font-semibold text-lg mb-1">Platform Integration</h3>
+                        <p class="text-blue-200">Works with Shopee, Lazada, TikTok Shop, Amazon & more</p>
+                    </div>
+                </div>
+                <div class="flex items-start gap-3">
+                    <i data-lucide="shield" class="w-6 h-6 text-blue-300 flex-shrink-0 mt-1"></i>
+                    <div>
+                        <h3 class="font-semibold text-lg mb-1">Start Free</h3>
+                        <p class="text-blue-200">No credit card required. Start protecting your profits today.</p>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- 右侧：注册表单区 -->
+    <div class="flex-1 flex items-center justify-center p-8">
+        <div class="w-full max-w-md">
+            <!-- 移动端 Logo (仅在小屏幕显示) -->
+            <div class="lg:hidden flex items-center gap-3 mb-8">
+                <div class="w-12 h-12 bg-[#0a2463] flex items-center justify-center rounded-md">
+                    <i data-lucide="trending-up" class="w-8 h-8 text-white"></i>
+                </div>
+                <div>
+                    <h1 class="text-2xl font-bold text-[#0a2463]">FXGuard</h1>
+                    <p class="text-sm text-gray-600">FX Risk Management</p>
+                </div>
+            </div>
+
+            <div class="mb-8">
+                <h2 class="text-3xl font-bold text-[#0a2463] mb-2">Create Account</h2>
+                <p class="text-gray-600">Start protecting your e-commerce profits today</p>
+            </div>
+
+            <form id="registerForm" class="space-y-5">
+                <!-- 账号名 -->
+                <div class="space-y-2">
+                    <label for="account" class="text-[#0a2463] font-semibold block text-sm">Account Name</label>
+                    <input type="text" id="account" placeholder="Enter your account name" required
+                        class="w-full h-12 px-3 border-2 border-gray-300 rounded-md focus:border-[#0a2463] focus:outline-none transition-colors">
+                </div>
+
+                <!-- 邮箱 -->
+                <div class="space-y-2">
+                    <label for="email" class="text-[#0a2463] font-semibold block text-sm">Email Address</label>
+                    <input type="email" id="email" placeholder="Enter your email" required
+                        class="w-full h-12 px-3 border-2 border-gray-300 rounded-md focus:border-[#0a2463] focus:outline-none transition-colors">
+                </div>
+
+                <!-- 结算货币 -->
+                <div class="space-y-2">
+                    <label for="currency" class="text-[#0a2463] font-semibold block text-sm">Primary Settlement Currency</label>
+                    <select id="currency" required
+                        class="w-full h-12 px-3 border-2 border-gray-300 rounded-md focus:border-[#0a2463] focus:outline-none bg-white transition-colors cursor-pointer">
+                        <option value="" disabled selected>Select your currency</option>
+                        <option value="CNY">CNY - Chinese Yuan Renminbi</option>
+                        <option value="MYR">MYR - Malaysian Ringgit</option>
+                        <option value="THB">THB - Thai Baht</option>
+                        <option value="IDR">IDR - Indonesian Rupiah</option>
+                        <option value="VND">VND - Vietnamese Dong</option>
+                        <option value="SGD">SGD - Singapore Dollar</option>
+                        <option value="PHP">PHP - Philippine Peso</option>
+                        <option value="EUR">EUR - Euro</option>
+                        <option value="GBP">GBP - British Pound</option>
+                    </select>
+                </div>
+
+                <!-- 平台选择 -->
+                <div class="space-y-2">
+                    <label for="platform" class="text-[#0a2463] font-semibold block text-sm">Which platform do you primarily sell on?</label>
+                    <select id="platform" required
+                        class="w-full h-12 px-3 border-2 border-gray-300 rounded-md focus:border-[#0a2463] focus:outline-none bg-white transition-colors cursor-pointer">
+                        <option value="" disabled selected>Select your platform</option>
+                        <option value="shopee">Shopee</option>
+                        <option value="lazada">Lazada</option>
+                        <option value="tiktok">TikTok Shop</option>
+                        <option value="amazon">Amazon</option>
+                        <option value="tokopedia">Tokopedia</option>
+                        <option value="bukalapak">Bukalapak</option>
+                        <option value="other">Other</option>
+                    </select>
+                </div>
+
+                <!-- 密码 -->
+                <div class="space-y-2">
+                    <label for="password" class="text-[#0a2463] font-semibold block text-sm">Password</label>
+                    <input type="password" id="password" placeholder="Create a password" required
+                        class="w-full h-12 px-3 border-2 border-gray-300 rounded-md focus:border-[#0a2463] focus:outline-none transition-colors">
+                </div>
+
+                <!-- 确认密码 -->
+                <div class="space-y-2">
+                    <label for="confirmPassword" class="text-[#0a2463] font-semibold block text-sm">Confirm Password</label>
+                    <input type="password" id="confirmPassword" placeholder="Confirm your password" required
+                        class="w-full h-12 px-3 border-2 border-gray-300 rounded-md focus:border-[#0a2463] focus:outline-none transition-colors">
+                </div>
+
+                <!-- 按钮 -->
+                <button type="submit"
+                    class="w-full h-12 bg-[#0a2463] hover:bg-[#1e3a8a] text-white font-semibold rounded-md transition-colors">
+                    Create Account
+                </button>
+            </form>
+
+            <div class="mt-6 text-center">
+                <p class="text-sm text-gray-600">
+                    Already have an account? 
+                    <a href="login.html" class="text-[#0a2463] font-semibold hover:underline cursor-pointer">Sign in</a>
+                </p>
+            </div>
+        </div>
+    </div>
+
+    <!-- 交互逻辑 -->
+    <script>
+        lucide.createIcons();
+
+        document.getElementById('registerForm').addEventListener('submit', function(e) {
+            e.preventDefault(); // 阻止默认刷新
+            
+            const account = document.getElementById('account').value;
+            const password = document.getElementById('password').value;
+            const confirmPassword = document.getElementById('confirmPassword').value;
+
+            if (password !== confirmPassword) {
+                alert("Passwords do not match!");
+                return;
+            }
+
+            // 【核心新增】把注册的账号名存入浏览器缓存
+            localStorage.setItem("registeredAccount", account);
+
+            const currency = document.getElementById('currency').value;
+            const platformObj = document.getElementById('platform');
+            const platform = platformObj.options[platformObj.selectedIndex].text;
+            
+            localStorage.setItem("preferredCurrency", currency);
+            localStorage.setItem("platform", platform);
+
+            alert("Account created successfully! Please log in.");
+            // 跳转到登录页
+            window.location.href = './login.html';
+        });
+    </script>
+</body>
+</html>
