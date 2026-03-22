@@ -1,46 +1,18 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-<!-- 让页面在手机上全屏运行，隐藏浏览器的地址栏和底部工具栏 -->
-<meta name="apple-mobile-web-app-capable" content="yes">
-<meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
-<!-- 设置在手机桌面显示的图标 (如果你有图标的话) -->
-<link rel="apple-touch-icon" href="icon.png">
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="apple-mobile-web-app-capable" content="yes">
+    <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+    <link rel="apple-touch-icon" href="icon.png">
     <title>FXGuard - Dashboard</title>
-    <!-- 引入 Tailwind CSS -->
     <script src="https://cdn.tailwindcss.com"></script>
-    <!-- 引入 Lucide 图标库 -->
     <script src="https://unpkg.com/lucide@latest"></script>
-    <!-- 引入 Chart.js 用于绘制汇率图表 -->
     <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
 </head>
 
-<!-- 移动端专属底部导航 -->
-<div class="lg:hidden fixed bottom-0 left-0 right-0 bg-white border-t border-gray-200 px-6 py-3 flex justify-between items-center z-50">
-    <a href="dashboard.html" class="flex flex-col items-center text-[#0a2463]">
-        <i data-lucide="layout-dashboard" class="w-6 h-6"></i>
-        <span class="text-[10px] mt-1 font-bold">Home</span>
-    </a>
-    <a href="data-input.html" class="flex flex-col items-center text-gray-400">
-        <i data-lucide="plus-circle" class="w-6 h-6"></i>
-        <span class="text-[10px] mt-1">New Risk</span>
-    </a>
-    <a href="risk-report.html" class="flex flex-col items-center text-gray-400">
-        <i data-lucide="file-text" class="w-6 h-6"></i>
-        <span class="text-[10px] mt-1">Report</span>
-    </a>
-    <a href="login.html" class="flex flex-col items-center text-gray-400">
-        <i data-lucide="user" class="w-6 h-6"></i>
-        <span class="text-[10px] mt-1">Profile</span>
-    </a>
-</div>
-
-<!-- 记得在原本的脚本里加一行重新渲染图标的逻辑 -->
-<script>lucide.createIcons();</script>
-
-<body class="min-h-screen bg-gray-50 text-gray-900 font-sans">
+<body class="min-h-screen bg-gray-50 text-gray-900 font-sans pb-20">
 
     <!-- 顶部导航栏 -->
     <div class="bg-[#0a2463] text-white">
@@ -55,7 +27,6 @@
                         <p class="text-xs text-blue-200">Dashboard</p>
                     </div>
                 </div>
-                <!-- 登出按钮 -->
                 <button id="logoutBtn" class="border border-white text-white hover:bg-white hover:text-[#0a2463] px-4 py-2 rounded-md text-sm font-medium transition-colors flex items-center">
                     <i data-lucide="log-out" class="w-4 h-4 mr-2"></i>
                     Logout
@@ -66,14 +37,14 @@
 
     <!-- 主体内容 -->
     <div class="container mx-auto px-6 py-8 max-w-7xl">
-        
+
         <!-- 欢迎语 -->
         <div class="mb-8">
             <h2 class="text-3xl font-bold text-[#0a2463] mb-2">Welcome Back!</h2>
             <p class="text-gray-600">Platform: <span id="displayPlatform" class="font-semibold">Shopee</span> | Settlement Currency: <span id="displayCurrency" class="font-semibold">MYR</span></p>
         </div>
 
-        <!-- 第一排：数据统计网格 (3个卡片) -->
+        <!-- 第一排：数据统计网格 -->
         <div class="grid grid-cols-1 md:grid-cols-3 gap-6 mb-8">
             <!-- 累计节省 -->
             <div class="bg-gradient-to-br from-green-600 to-green-700 text-white p-8 shadow-lg rounded-sm">
@@ -90,7 +61,7 @@
                 <p class="text-green-100">Cumulative savings since you started</p>
             </div>
 
-            <!-- 活跃对冲 (修改为了空白初始态) -->
+            <!-- 活跃对冲 -->
             <div class="bg-white border-2 border-gray-200 p-8 rounded-sm">
                 <div class="flex items-center gap-3 mb-4">
                     <div class="w-12 h-12 bg-blue-100 flex items-center justify-center rounded-full">
@@ -104,7 +75,7 @@
                 <p class="text-gray-600">No active contracts</p>
             </div>
 
-            <!-- 下次结算 (修改为了空白初始态) -->
+            <!-- 下次结算 -->
             <div class="bg-white border-2 border-gray-200 p-8 rounded-sm">
                 <div class="flex items-center gap-3 mb-4">
                     <div class="w-12 h-12 bg-orange-100 flex items-center justify-center rounded-full">
@@ -119,7 +90,7 @@
             </div>
         </div>
 
-        <!-- 第二排：实时汇率图表区 (CNY/MYR) -->
+        <!-- 第二排：实时汇率图表区 -->
         <div class="bg-white border-2 border-gray-200 p-8 mb-8 rounded-sm">
             <div class="flex items-center justify-between mb-6">
                 <div>
@@ -138,8 +109,7 @@
                     </div>
                 </div>
             </div>
-            
-            <!-- Chart.js 容器 -->
+
             <div class="w-full h-[400px]">
                 <canvas id="exchangeRateChart"></canvas>
             </div>
@@ -151,7 +121,7 @@
             </div>
         </div>
 
-        <!-- 第三排：快捷操作区 (2个卡片) -->
+        <!-- 第三排：快捷操作区 -->
         <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
             <!-- 发起风险评估 -->
             <div class="bg-white border-2 border-[#0a2463] p-8 rounded-sm flex flex-col justify-between">
@@ -161,7 +131,6 @@
                         Analyze your current exchange rate exposure and get AI-powered hedging recommendations.
                     </p>
                 </div>
-                <!-- mt-auto 保证按钮始终沉底对齐 -->
                 <button id="startRiskBtn" class="w-full h-12 bg-[#0a2463] hover:bg-[#1e3a8a] text-white font-semibold rounded-md transition-colors flex items-center justify-center mt-auto">
                     Start Risk Diagnosis
                     <i data-lucide="arrow-right" class="w-5 h-5 ml-2"></i>
@@ -169,72 +138,72 @@
             </div>
 
             <!-- 最近活动 -->
-          <div class="bg-gray-100 border-2 border-gray-300 p-8 rounded-sm flex flex-col">
+            <div class="bg-gray-100 border-2 border-gray-300 p-8 rounded-sm flex flex-col">
                 <h3 class="text-2xl font-bold text-[#0a2463] mb-6">Recent Activity</h3>
-                <div class="flex-1 flex flex-col items-center justify-center text-center py-8">
-                    <div class="w-16 h-16 bg-gray-200 flex items-center justify-center rounded-full mb-4">
-                        <i data-lucide="inbox" class="w-8 h-8 text-gray-400"></i>
-                    </div>
-                    <p class="font-semibold text-gray-600 mb-1">No recent activity yet.</p>
-                    <p class="text-sm text-gray-500">Start your first risk assessment to get started.</p>
-                </div>
-            </div>
-                            <p class="font-semibold text-gray-900">Forward Contract Executed</p>
-                            <p class="text-sm text-gray-500">30,000 CNY @ 0.65 <span class="currency-label">MYR</span></p>
+                <div id="activityContainer" class="flex-1 flex flex-col">
+                    <!-- 默认空状态，JS 控制显示/隐藏 -->
+                    <div id="emptyState" class="flex-1 flex flex-col items-center justify-center text-center py-8">
+                        <div class="w-16 h-16 bg-gray-200 flex items-center justify-center rounded-full mb-4">
+                            <i data-lucide="inbox" class="w-8 h-8 text-gray-400"></i>
                         </div>
-                        <span class="text-xs text-gray-500">2 days ago</span>
-                    </div>
-                    <div class="flex items-center justify-between py-2 border-b border-gray-300">
-                        <div>
-                            <p class="font-semibold text-gray-900">Settlement Completed</p>
-                            <p class="text-sm text-gray-500">50,000 CNY converted</p>
-                        </div>
-                        <span class="text-xs text-gray-500">5 days ago</span>
-                    </div>
-                    <div class="flex items-center justify-between py-2">
-                        <div>
-                            <p class="font-semibold text-gray-900">Risk Assessment</p>
-                            <p class="text-sm text-gray-500">70% hedging recommended</p>
-                        </div>
-                        <span class="text-xs text-gray-500">1 week ago</span>
+                        <p class="font-semibold text-gray-600 mb-1">No recent activity yet.</p>
+                        <p class="text-sm text-gray-500">Start your first risk assessment to get started.</p>
                     </div>
                 </div>
             </div>
         </div>
     </div>
 
+    <!-- 移动端底部导航 -->
+    <div class="lg:hidden fixed bottom-0 left-0 right-0 bg-white border-t border-gray-200 px-6 py-3 flex justify-between items-center z-50">
+        <a href="dashboard.html" class="flex flex-col items-center text-[#0a2463]">
+            <i data-lucide="layout-dashboard" class="w-6 h-6"></i>
+            <span class="text-[10px] mt-1 font-bold">Home</span>
+        </a>
+        <a href="data-input.html" class="flex flex-col items-center text-gray-400">
+            <i data-lucide="plus-circle" class="w-6 h-6"></i>
+            <span class="text-[10px] mt-1">New Risk</span>
+        </a>
+        <a href="risk-report.html" class="flex flex-col items-center text-gray-400">
+            <i data-lucide="file-text" class="w-6 h-6"></i>
+            <span class="text-[10px] mt-1">Report</span>
+        </a>
+        <a href="login.html" class="flex flex-col items-center text-gray-400">
+            <i data-lucide="user" class="w-6 h-6"></i>
+            <span class="text-[10px] mt-1">Profile</span>
+        </a>
+    </div>
+
     <!-- 交互逻辑 -->
     <script>
-        // 初始化 Lucide 图标
+        // 初始化 Lucide 图标（只调用一次，放在所有 HTML 之后）
         lucide.createIcons();
 
         // 1. 从本地缓存读取偏好设置
         const preferredCurrency = localStorage.getItem("preferredCurrency") || "MYR";
         const platform = localStorage.getItem("platform") || "Shopee";
 
-        // 更新页面上的文本
         document.getElementById('displayPlatform').textContent = platform;
         document.getElementById('displayCurrency').textContent = preferredCurrency;
-        
         document.querySelectorAll('.currency-label').forEach(el => {
             el.textContent = preferredCurrency;
         });
 
-        // 2. 模拟过去 30 天的真实法币波动数据 (CNY)
+        // 2. 模拟过去 30 天的汇率数据（固定种子，避免每次刷新都变）
         const generateMockData = () => {
             const labels = [];
             const data = [];
-            let baseRate = 0.65; // CNY/MYR 基础汇率
+            const baseRate = 0.6482; // CNY/MYR 基础汇率（固定）
+            // 使用固定的偏移数组，保证每次刷新数据一致
+            const offsets = [0,-0.002,0.003,-0.001,0.004,-0.003,0.001,0.005,-0.002,0.002,
+                            -0.004,0.003,0.001,-0.001,0.002,-0.003,0.004,-0.002,0.001,0.003,
+                            -0.001,-0.002,0.004,0.002,-0.003,0.001,-0.001,0.003,0.002,-0.001,0.002];
 
             for (let i = 30; i >= 0; i--) {
                 const date = new Date();
                 date.setDate(date.getDate() - i);
                 const dateString = date.toLocaleDateString('en-US', { month: 'short', day: 'numeric' });
-                
-                // 将波动幅度限制在 0.02
-                const randomChange = (Math.random() - 0.5) * 0.02;
-                const rate = Number((baseRate + randomChange).toFixed(4));
-                
+                const rate = Number((baseRate + offsets[30 - i]).toFixed(4));
                 labels.push(dateString);
                 data.push(rate);
             }
@@ -245,14 +214,11 @@
         const currentRate = chartData.data[chartData.data.length - 1];
         const firstRate = chartData.data[0];
         const rateChange = (((currentRate - firstRate) / firstRate) * 100).toFixed(2);
-        
-        // 更新图表上方的实时数字
+
         document.getElementById('currentRateDisplay').textContent = currentRate;
         const rateChangeEl = document.getElementById('rateChangeDisplay');
         rateChangeEl.textContent = (rateChange >= 0 ? '+' : '') + rateChange + '%';
         rateChangeEl.className = rateChange >= 0 ? "text-xl font-semibold text-green-600" : "text-xl font-semibold text-red-600";
-        
-        // 更新市场洞察文字
         document.getElementById('insightTrend').textContent = rateChange >= 0 ? 'appreciated' : 'depreciated';
         document.getElementById('insightPercent').textContent = Math.abs(rateChange);
 
@@ -265,12 +231,12 @@
                 datasets: [{
                     label: `CNY/${preferredCurrency}`,
                     data: chartData.data,
-                    borderColor: '#0a2463', // 深蓝色折线
+                    borderColor: '#0a2463',
                     borderWidth: 3,
-                    pointRadius: 0, 
-                    pointHoverRadius: 6, 
+                    pointRadius: 0,
+                    pointHoverRadius: 6,
                     fill: false,
-                    tension: 0.1 
+                    tension: 0.1
                 }]
             },
             options: {
@@ -301,14 +267,38 @@
             }
         });
 
-        // 4. 处理页面跳转逻辑
+        // 4. 页面跳转
         document.getElementById('logoutBtn').addEventListener('click', function() {
             window.location.href = './login.html';
         });
-
         document.getElementById('startRiskBtn').addEventListener('click', function() {
             window.location.href = './data-input.html';
         });
+
+        // 5. 动态渲染 Recent Activity（只声明一次，逻辑合并）
+        const activityContainer = document.getElementById('activityContainer');
+        const emptyState = document.getElementById('emptyState');
+        const activityLog = JSON.parse(localStorage.getItem('activityLog')) || [];
+
+        if (activityLog.length > 0) {
+            emptyState.style.display = 'none';
+            const listDiv = document.createElement('div');
+            listDiv.className = 'space-y-3';
+
+            activityLog.slice().reverse().forEach(activity => {
+                const item = document.createElement('div');
+                item.className = 'flex items-center justify-between py-2 border-b border-gray-300 last:border-0';
+                item.innerHTML = `
+                    <div>
+                        <p class="font-semibold text-gray-900">${activity.title}</p>
+                        <p class="text-sm text-gray-500">${activity.detail}</p>
+                    </div>
+                    <span class="text-xs text-gray-500">${activity.time}</span>
+                `;
+                listDiv.appendChild(item);
+            });
+            activityContainer.appendChild(listDiv);
+        }
     </script>
 </body>
 </html>
