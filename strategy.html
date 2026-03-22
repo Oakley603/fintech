@@ -86,24 +86,10 @@
             </p>
         </div>
 
-        <!-- 建议对冲比例卡片 -->
-        <div class="bg-gradient-to-r from-[#0a2463] to-[#1e3a8a] text-white p-10 mb-8 rounded-sm shadow-md">
-            <div class="flex items-center gap-4 mb-6">
-                <div class="w-16 h-16 bg-white flex items-center justify-center rounded-sm">
-                    <i data-lucide="shield" class="w-10 h-10 text-[#0a2463]"></i>
-                </div>
-                <div>
-                    <h2 class="text-3xl font-bold">Suggested Hedging Ratio</h2>
-                    <p class="text-blue-200">Optimal balance between protection and opportunity</p>
-                </div>
-            </div>
-            <div class="flex items-baseline gap-4 mb-4">
-                <span id="ratioDisplay" class="text-8xl font-bold">--%</span>
-                <div>
-                    <p class="text-2xl font-semibold">of total exposure</p>
-                    <p class="text-blue-200 text-lg"><span id="hedgedAmountDisplay">--</span> <span class="currency-label">MYR</span> protected</p>
-                </div>
-            </div>
+        <!-- 策略选择区 (三套方案) -->
+        <div class="grid md:grid-cols-3 gap-6 mb-8" id="strategyOptions">
+            <!-- 卡片将通过 JS 动态生成并注入这里 -->
+        </div>
             
             <!-- 原生进度条 -->
             <div class="bg-white/10 p-4 mt-6 rounded-sm">
@@ -117,40 +103,7 @@
             </div>
         </div>
 
-        <!-- 解释原因 -->
-        <div class="bg-blue-50 border-2 border-[#0a2463] p-8 mb-8 rounded-sm">
-            <h3 class="text-2xl font-bold text-[#0a2463] mb-4">Why <span id="whyRatioText">--</span>%?</h3>
-            <div class="grid md:grid-cols-3 gap-6">
-                <div class="bg-white p-6 border border-gray-200 rounded-sm">
-                    <div class="w-12 h-12 bg-green-100 flex items-center justify-center mb-3 rounded-full">
-                        <i data-lucide="shield" class="w-6 h-6 text-green-600"></i>
-                    </div>
-                    <h4 class="font-bold text-[#0a2463] mb-2">Protection</h4>
-                    <p class="text-sm text-gray-600">
-                        Locks in rates for <span id="protectRatioText">--</span>% of exposure, ensuring predictable cash flow.
-                    </p>
-                </div>
-                <div class="bg-white p-6 border border-gray-200 rounded-sm">
-                    <div class="w-12 h-12 bg-yellow-100 flex items-center justify-center mb-3 rounded-full">
-                        <i data-lucide="target" class="w-6 h-6 text-yellow-600"></i>
-                    </div>
-                    <h4 class="font-bold text-[#0a2463] mb-2">Flexibility</h4>
-                    <p class="text-sm text-gray-600">
-                        Keeps <span id="flexRatioText">--</span>% floating to benefit from favorable rate movements.
-                    </p>
-                </div>
-                <div class="bg-white p-6 border border-gray-200 rounded-sm">
-                    <div class="w-12 h-12 bg-blue-100 flex items-center justify-center mb-3 rounded-full">
-                        <i data-lucide="trending-up" class="w-6 h-6 text-blue-600"></i>
-                    </div>
-                    <h4 class="font-bold text-[#0a2463] mb-2">Optimized</h4>
-                    <p id="optimizedText" class="text-sm text-gray-600">
-                        Based on your risk tolerance and market volatility.
-                    </p>
-                </div>
-            </div>
-        </div>
-
+     
         <!-- 推荐操作步骤 -->
         <div class="border-2 border-gray-300 p-8 mb-8 rounded-sm">
             <h2 class="text-2xl font-bold text-[#0a2463] mb-6">
@@ -222,10 +175,36 @@
             </ul>
         </div>
 
-        <!-- 确认按钮 -->
-        <button id="confirmBtn" class="w-full h-16 bg-[#0a2463] hover:bg-[#1e3a8a] text-white font-bold text-xl rounded-md transition-colors shadow-lg">
+      <!-- 确认按钮 -->
+        <button id="confirmBtn" class="w-full h-14 bg-[#0a2463] hover:bg-[#1e3a8a] text-white font-bold text-lg rounded-md transition-colors shadow-sm mb-4">
             Acknowledge & Return to Dashboard
         </button>
+
+        <!-- 第三方执行按钮及下拉框 -->
+        <div class="relative w-full text-center mb-6">
+            <button id="executeBtn" class="w-full h-14 bg-white border-2 border-green-600 text-green-700 hover:bg-green-50 font-bold text-lg rounded-md transition-colors flex items-center justify-center">
+                Execute via Third-Party Platform
+                <i data-lucide="chevron-down" class="w-5 h-5 ml-2"></i>
+            </button>
+            
+            <!-- 下拉菜单 (默认隐藏) -->
+            <div id="executeDropdown" class="hidden absolute top-full left-0 w-full mt-2 bg-white border-2 border-green-600 rounded-md shadow-xl z-50 overflow-hidden text-left">
+                <a href="https://wise.com" target="_blank" class="flex items-center px-6 py-4 hover:bg-green-50 border-b border-gray-100 transition-colors">
+                    <i data-lucide="external-link" class="w-5 h-5 text-green-600 mr-3"></i>
+                    <div>
+                        <p class="font-bold text-gray-800">Wise</p>
+                        <p class="text-xs text-gray-500">Fast, low-cost international transfers</p>
+                    </div>
+                </a>
+                <a href="https://www.pingpongx.com" target="_blank" class="flex items-center px-6 py-4 hover:bg-green-50 transition-colors">
+                    <i data-lucide="external-link" class="w-5 h-5 text-green-600 mr-3"></i>
+                    <div>
+                        <p class="font-bold text-gray-800">PingPong</p>
+                        <p class="text-xs text-gray-500">Cross-border payment platform for e-commerce</p>
+                    </div>
+                </a>
+            </div>
+        </div>
 
         <!-- 新增：对冲成本透明化提示 -->
         <div class="mt-4 text-center">
@@ -249,63 +228,146 @@
         const riskTolerance = parseInt(localStorage.getItem("riskTolerance")) || 50;
         const preferredCurrency = localStorage.getItem("preferredCurrency") || "MYR";
         
-        // 动态计算对冲比例
-        let hedgingRatio = 70; 
-        let profileText = "Balanced";
-        
-        if (riskTolerance < 33) {
-            hedgingRatio = 90; 
-            profileText = "Conservative";
-        } else if (riskTolerance >= 67) {
-            hedgingRatio = 30; 
-            profileText = "Aggressive";
+// 动态对冲方案配置
+        const options = [
+            { id: 'opt_cons', name: 'Conservative', ratio: 90, desc: 'Maximum protection' },
+            { id: 'opt_bal', name: 'Balanced', ratio: 70, desc: 'Optimal trade-off' },
+            { id: 'opt_agg', name: 'Aggressive', ratio: 30, desc: 'Maximum upside' }
+        ];
+
+        // 确定推荐方案 (匹配用户偏好)
+        let recommendedRatio = 70;
+        if (riskTolerance < 33) recommendedRatio = 90;
+        else if (riskTolerance >= 67) recommendedRatio = 30;
+
+        let selectedRatio = recommendedRatio; // 默认选中推荐的比例
+        const strategyContainer = document.getElementById('strategyOptions');
+
+        // 渲染三个选项卡片
+        function renderOptions() {
+            strategyContainer.innerHTML = '';
+            options.forEach(opt => {
+                const isSelected = opt.ratio === selectedRatio;
+                const isRecommended = opt.ratio === recommendedRatio;
+                
+                const hAmount = unsettledAmount * (opt.ratio / 100);
+                const uAmount = unsettledAmount - hAmount;
+                const pGain = uAmount * 0.03; 
+                const pLoss = uAmount * 0.02; 
+
+                const cardHtml = `
+                    <div class="relative cursor-pointer border-2 rounded-md p-6 transition-all ${isSelected ? 'border-[#0a2463] bg-blue-50 shadow-md transform scale-105' : 'border-gray-200 bg-white hover:border-gray-300'}" onclick="selectStrategy(${opt.ratio})">
+                        ${isRecommended ? '<span class="absolute -top-3 left-1/2 -translate-x-1/2 bg-[#0a2463] text-white text-xs font-bold px-3 py-1 rounded-full whitespace-nowrap">Recommended</span>' : ''}
+                        <div class="text-center mb-4 mt-2">
+                            <h3 class="text-xl font-bold text-gray-800">${opt.name}</h3>
+                            <p class="text-xs text-gray-500 mt-1">${opt.desc}</p>
+                        </div>
+                        <div class="text-center mb-5">
+                            <span class="text-4xl font-bold text-[#0a2463]">${opt.ratio}%</span>
+                            <span class="text-sm text-gray-600 block">Hedged</span>
+                        </div>
+                        <div class="space-y-2 text-sm text-gray-600">
+                            <div class="flex justify-between border-b pb-1">
+                                <span>Protected:</span>
+                                <span class="font-bold text-gray-800">${hAmount.toLocaleString(undefined, {maximumFractionDigits:0})} <span class="currency-label">${preferredCurrency}</span></span>
+                            </div>
+                            <div class="flex justify-between border-b pb-1">
+                                <span>Pot. Gain:</span>
+                                <span class="font-bold text-green-600">+${pGain.toLocaleString(undefined, {maximumFractionDigits:0})}</span>
+                            </div>
+                            <div class="flex justify-between">
+                                <span>Pot. Loss:</span>
+                                <span class="font-bold text-red-600">-${pLoss.toLocaleString(undefined, {maximumFractionDigits:0})}</span>
+                            </div>
+                        </div>
+                    </div>
+                `;
+                strategyContainer.innerHTML += cardHtml;
+            });
+            // 重新绑定 currency 标签
+            document.querySelectorAll('.currency-label').forEach(el => el.textContent = preferredCurrency);
         }
 
-        const unhedgedRatio = 100 - hedgingRatio;
-        // 计算时直接使用输入的金额（现在统一理解为目标货币金额）
-        const hedgedAmount = unsettledAmount * (hedgingRatio / 100);
-        const unhedgedAmount = unsettledAmount - hedgedAmount;
+        // 处理点击选择逻辑
+        window.selectStrategy = function(ratio) {
+            selectedRatio = ratio;
+            renderOptions();
+            updateDetails();
+        };
 
-        // 统一更新货币单位
-        document.querySelectorAll('.currency-label').forEach(el => {
-            el.textContent = preferredCurrency;
-        });
+        // 更新下方执行步骤及成本数据
+        function updateDetails() {
+            const hAmount = unsettledAmount * (selectedRatio / 100);
+            const uAmount = unsettledAmount - hAmount;
+            const unhedgedRatio = 100 - selectedRatio;
 
-        // 填充页面数据
-        document.getElementById('ratioDisplay').textContent = hedgingRatio + '%';
-        document.getElementById('hedgedAmountDisplay').textContent = hedgedAmount.toLocaleString(undefined, {maximumFractionDigits: 0});
-// 假设第三方平台（如 Wise/PingPong）的换汇/对冲手续费约为对冲金额的 0.5%
-        // 将其换算为占“总敞口”的百分比，以及具体金额
-        const platformFeeRate = 0.005;
-        const estimatedCostRatio = (hedgingRatio * platformFeeRate).toFixed(2); 
-        const estimatedCostAmount = (hedgedAmount * platformFeeRate);
-        
-        document.getElementById('costRatioDisplay').textContent = estimatedCostRatio;
-        document.getElementById('costAmountDisplay').textContent = estimatedCostAmount.toLocaleString(undefined, {maximumFractionDigits: 0});
-        
-        document.getElementById('ratioProgressBar').style.width = hedgingRatio + '%';
-        document.getElementById('hedgedBarText').textContent = hedgedAmount.toLocaleString(undefined, {maximumFractionDigits: 0});
-        document.getElementById('unhedgedBarText').textContent = unhedgedAmount.toLocaleString(undefined, {maximumFractionDigits: 0});
+            document.getElementById('step1Hedged').textContent = hAmount.toLocaleString(undefined, {maximumFractionDigits: 0});
+            document.getElementById('step1Ratio').textContent = selectedRatio;
+            
+            document.getElementById('step2Unhedged').textContent = uAmount.toLocaleString(undefined, {maximumFractionDigits: 0});
+            document.getElementById('step2Ratio').textContent = unhedgedRatio;
+            document.getElementById('step2Days').textContent = settlementPeriod;
 
-        document.getElementById('whyRatioText').textContent = hedgingRatio;
-        document.getElementById('protectRatioText').textContent = hedgingRatio;
-        document.getElementById('flexRatioText').textContent = unhedgedRatio;
-        document.getElementById('optimizedText').textContent = `Based on your ${profileText} risk tolerance setting.`;
+            document.getElementById('resultRatio').textContent = selectedRatio;
+            document.getElementById('resultUnhedged').textContent = unhedgedRatio;
 
-        document.getElementById('step1Hedged').textContent = hedgedAmount.toLocaleString(undefined, {maximumFractionDigits: 0});
-        document.getElementById('step1Ratio').textContent = hedgingRatio;
-        
-        document.getElementById('step2Unhedged').textContent = unhedgedAmount.toLocaleString(undefined, {maximumFractionDigits: 0});
-        document.getElementById('step2Ratio').textContent = unhedgedRatio;
-        document.getElementById('step2Days').textContent = settlementPeriod;
+            // 成本测算 (0.5% 手续费)
+            const platformFeeRate = 0.005;
+            const estimatedCostRatio = (selectedRatio * platformFeeRate).toFixed(2); 
+            const estimatedCostAmount = (hAmount * platformFeeRate);
+            
+            document.getElementById('costRatioDisplay').textContent = estimatedCostRatio;
+            document.getElementById('costAmountDisplay').textContent = estimatedCostAmount.toLocaleString(undefined, {maximumFractionDigits: 0});
+        }
 
-        document.getElementById('resultRatio').textContent = hedgingRatio;
-        document.getElementById('resultUnhedged').textContent = unhedgedRatio;
+        // 初始化
+        renderOptions();
+        updateDetails();
 
-        // 确认按钮交互
-        document.getElementById('confirmBtn').addEventListener('click', function() {
-            window.location.href = 'dashboard.html';
-        });
+        // 第三方按钮下拉逻辑
+        const executeBtn = document.getElementById('executeBtn');
+        const executeDropdown = document.getElementById('executeDropdown');
+        if (executeBtn && executeDropdown) {
+            executeBtn.addEventListener('click', () => {
+                executeDropdown.classList.toggle('hidden');
+                // 切换箭头图标方向
+                const icon = executeBtn.querySelector('i');
+                if(executeDropdown.classList.contains('hidden')){
+                    icon.setAttribute('data-lucide', 'chevron-down');
+                } else {
+                    icon.setAttribute('data-lucide', 'chevron-up');
+                }
+                lucide.createIcons();
+            });
+        }
+
+       // 确认按钮交互 (生成动态日志并跳转)
+        const confirmBtn = document.getElementById('confirmBtn');
+        if (confirmBtn) {
+            confirmBtn.addEventListener('click', function() {
+                // 1. 获取已有的活动记录 (如果没有则创建空数组)
+                let activityLog = JSON.parse(localStorage.getItem('activityLog')) || [];
+                
+                // 2. 创建新的活动对象 (使用当前页面的变量)
+                const newActivity = {
+                    title: 'Risk Assessment Completed',
+                    detail: `${selectedRatio}% hedging recommended for ${unsettledAmount.toLocaleString()} ${preferredCurrency}`,
+                    time: 'Just now'
+                };
+                
+                // 3. 将新活动加到数组最前面 (保证最新的在最上面)
+                activityLog.unshift(newActivity);
+                
+                // 为了防止日志无限变长，可以只保留最近的 5 条
+                if (activityLog.length > 5) activityLog.pop();
+                
+                // 4. 保存回 localStorage
+                localStorage.setItem('activityLog', JSON.stringify(activityLog));
+
+                // 5. 跳转回 Dashboard 形成闭环
+                window.location.href = './dashboard.html';
+            });
+        }
     </script>
 </body>
 </html>

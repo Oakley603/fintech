@@ -190,7 +190,7 @@
         lucide.createIcons();
 
         document.getElementById('registerForm').addEventListener('submit', function(e) {
-            e.preventDefault(); // 阻止默认刷新
+            e.preventDefault(); // 关键：死死拦住表单的默认刷新行为
             
             const account = document.getElementById('account').value;
             const password = document.getElementById('password').value;
@@ -201,9 +201,9 @@
                 return;
             }
 
-            // 【核心新增】把注册的账号名存入浏览器缓存
+            // 保存用户数据到本地缓存
             localStorage.setItem("registeredAccount", account);
-
+            
             const currency = document.getElementById('currency').value;
             const platformObj = document.getElementById('platform');
             const platform = platformObj.options[platformObj.selectedIndex].text;
@@ -211,9 +211,10 @@
             localStorage.setItem("preferredCurrency", currency);
             localStorage.setItem("platform", platform);
 
-            alert("Account created successfully! Please log in.");
-            // 跳转到登录页
-            window.location.href = './login.html';
+            alert("Account created successfully! Redirecting to Dashboard...");
+            
+            // 使用 replace 强制跳转，这样用户点击浏览器的“返回”按钮时就不会再退回注册页了
+            window.location.replace('./dashboard.html');
         });
     </script>
 </body>
