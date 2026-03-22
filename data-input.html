@@ -1,44 +1,17 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-<!-- 让页面在手机上全屏运行，隐藏浏览器的地址栏和底部工具栏 -->
-<meta name="apple-mobile-web-app-capable" content="yes">
-<meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
-<!-- 设置在手机桌面显示的图标 (如果你有图标的话) -->
-<link rel="apple-touch-icon" href="icon.png">
+    <meta name="apple-mobile-web-app-capable" content="yes">
+    <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+    <link rel="apple-touch-icon" href="icon.png">
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>FXGuard - Data Input</title>
-    <!-- 引入 Tailwind CSS -->
     <script src="https://cdn.tailwindcss.com"></script>
-    <!-- 引入 Lucide 图标库 -->
     <script src="https://unpkg.com/lucide@latest"></script>
 </head>
 
-<!-- 移动端专属底部导航 -->
-<div class="lg:hidden fixed bottom-0 left-0 right-0 bg-white border-t border-gray-200 px-6 py-3 flex justify-between items-center z-50">
-    <a href="dashboard.html" class="flex flex-col items-center text-[#0a2463]">
-        <i data-lucide="layout-dashboard" class="w-6 h-6"></i>
-        <span class="text-[10px] mt-1 font-bold">Home</span>
-    </a>
-    <a href="data-input.html" class="flex flex-col items-center text-gray-400">
-        <i data-lucide="plus-circle" class="w-6 h-6"></i>
-        <span class="text-[10px] mt-1">New Risk</span>
-    </a>
-    <a href="risk-report.html" class="flex flex-col items-center text-gray-400">
-        <i data-lucide="file-text" class="w-6 h-6"></i>
-        <span class="text-[10px] mt-1">Report</span>
-    </a>
-    <a href="login.html" class="flex flex-col items-center text-gray-400">
-        <i data-lucide="user" class="w-6 h-6"></i>
-        <span class="text-[10px] mt-1">Profile</span>
-    </a>
-</div>
-
-<!-- 记得在原本的脚本里加一行重新渲染图标的逻辑 -->
-<script>lucide.createIcons();</script>
-
-<body class="min-h-screen bg-white text-gray-900 font-sans">
+<body class="min-h-screen bg-white text-gray-900 font-sans pb-20">
 
     <!-- 顶部导航栏 -->
     <div class="bg-[#0a2463] text-white">
@@ -57,7 +30,6 @@
 
     <!-- 主体内容 -->
     <div class="container mx-auto px-6 py-12 max-w-3xl">
-        <!-- 返回按钮 -->
         <a href="dashboard.html" class="flex items-center gap-2 text-[#0a2463] font-semibold mb-6 hover:underline inline-flex">
             <i data-lucide="arrow-left" class="w-5 h-5"></i>
             Back to Dashboard
@@ -65,9 +37,7 @@
 
         <div class="mb-8">
             <h1 class="text-4xl font-bold text-[#0a2463] mb-3">Risk Diagnosis</h1>
-            <p class="text-gray-600 text-lg">
-                Enter your transaction details to analyze your exchange rate risk exposure
-            </p>
+            <p class="text-gray-600 text-lg">Enter your transaction details to analyze your exchange rate risk exposure</p>
         </div>
 
         <!-- 进度指示器 -->
@@ -88,9 +58,9 @@
             </div>
         </div>
 
-        <!-- 数据输入表单 -->
+        <!-- 表单 -->
         <form id="dataInputForm" class="space-y-8">
-            
+
             <!-- 预期结算金额 -->
             <div class="space-y-3">
                 <label for="amount" class="text-[#0a2463] font-bold text-lg block">
@@ -99,9 +69,7 @@
                 <div class="relative">
                     <input type="number" id="amount" placeholder="Enter amount" required min="1"
                         class="w-full h-14 text-lg border-2 border-gray-300 rounded-md focus:border-[#0a2463] focus:outline-none px-4 pr-16 transition-colors">
-                    <span id="amountCurrencyLabel" class="absolute right-4 top-1/2 -translate-y-1/2 text-gray-500 font-semibold">
-                        MYR
-                    </span>
+                    <span id="amountCurrencyLabel" class="absolute right-4 top-1/2 -translate-y-1/2 text-gray-500 font-semibold">MYR</span>
                 </div>
                 <p class="text-sm text-gray-500">Enter the total expected settlement amount in your primary currency</p>
             </div>
@@ -125,7 +93,7 @@
                     class="w-full h-14 text-lg border-2 border-gray-300 rounded-md focus:border-[#0a2463] focus:outline-none px-4 bg-white transition-colors cursor-pointer">
                     <option value="" disabled>Select currency</option>
                     <option value="CNY">CNY - Chinese Yuan Renminbi</option>
-                    <option value="MYR" selected>MYR - Malaysian Ringgit</option>
+                    <option value="MYR">MYR - Malaysian Ringgit</option>
                     <option value="THB">THB - Thai Baht</option>
                     <option value="IDR">IDR - Indonesian Rupiah</option>
                     <option value="VND">VND - Vietnamese Dong</option>
@@ -137,25 +105,19 @@
                 <p class="text-sm text-gray-500">The currency you will receive after settlement</p>
             </div>
 
-            <!-- 风险承受能力滑动条及说明方框 -->
+            <!-- 风险承受能力 -->
             <div class="space-y-6">
-                <label class="text-[#0a2463] font-bold text-lg block">
-                    Risk Tolerance
-                </label>
-                
-                <!-- 滑块部分 -->
+                <label class="text-[#0a2463] font-bold text-lg block">Risk Tolerance</label>
                 <div class="px-6 py-10 bg-gray-50 border-2 border-gray-200 rounded-sm">
                     <div class="mb-8">
-                        <input type="range" id="riskSlider" min="0" max="100" value="50" step="1" 
+                        <input type="range" id="riskSlider" min="0" max="100" value="50" step="1"
                             class="w-full h-2 bg-gray-300 rounded-lg appearance-none cursor-pointer accent-[#0a2463] mb-6">
-                        
                         <div class="flex justify-between items-center text-sm text-gray-600 mb-8">
                             <span class="font-semibold">0% Conservative</span>
                             <span class="font-semibold">50% Balanced</span>
                             <span class="font-semibold">100% Aggressive</span>
                         </div>
                     </div>
-                    
                     <div class="text-center p-6 bg-white border-2 border-[#0a2463] rounded-sm">
                         <p class="text-sm text-gray-600 mb-2">Your Selected Risk Level</p>
                         <div class="flex items-center justify-center gap-3">
@@ -164,8 +126,6 @@
                         </div>
                     </div>
                 </div>
-
-                <!-- 补回来的：三个风险等级说明方框 -->
                 <div class="grid grid-cols-3 gap-4 text-sm">
                     <div class="text-center p-4 bg-green-50 border border-green-200 rounded-sm">
                         <p class="font-bold text-green-700 mb-1">0-33% Conservative</p>
@@ -192,82 +152,71 @@
         </form>
     </div>
 
-    <!-- 交互逻辑 -->
+    <!-- 移动端底部导航 -->
+    <div class="lg:hidden fixed bottom-0 left-0 right-0 bg-white border-t border-gray-200 px-6 py-3 flex justify-between items-center z-50">
+        <a href="dashboard.html" class="flex flex-col items-center text-gray-400">
+            <i data-lucide="layout-dashboard" class="w-6 h-6"></i>
+            <span class="text-[10px] mt-1">Home</span>
+        </a>
+        <a href="data-input.html" class="flex flex-col items-center text-[#0a2463]">
+            <i data-lucide="plus-circle" class="w-6 h-6"></i>
+            <span class="text-[10px] mt-1 font-bold">New Risk</span>
+        </a>
+        <a href="risk-report.html" class="flex flex-col items-center text-gray-400">
+            <i data-lucide="file-text" class="w-6 h-6"></i>
+            <span class="text-[10px] mt-1">Report</span>
+        </a>
+        <a href="login.html" class="flex flex-col items-center text-gray-400">
+            <i data-lucide="user" class="w-6 h-6"></i>
+            <span class="text-[10px] mt-1">Profile</span>
+        </a>
+    </div>
+
     <script>
         lucide.createIcons();
 
-        // 1. 读取保存的货币偏好并更新 UI
+        // 读取保存的货币偏好
         const savedCurrency = localStorage.getItem("preferredCurrency");
         const amountCurrencyLabel = document.getElementById('amountCurrencyLabel');
         const currencySelect = document.getElementById('currency');
-        
-        if (savedCurrency && currencySelect) {
+
+        if (savedCurrency) {
             currencySelect.value = savedCurrency;
-            if (amountCurrencyLabel) {
-                amountCurrencyLabel.textContent = savedCurrency;
-            }
+            amountCurrencyLabel.textContent = savedCurrency;
         }
 
-        // 当用户改变下拉菜单时，实时更新输入框右侧的货币单位
-        if (currencySelect) {
-            currencySelect.addEventListener('change', function(e) {
-                if (amountCurrencyLabel) {
-                    amountCurrencyLabel.textContent = e.target.value;
-                }
-            });
-        }
+        // 货币切换时更新标签
+        currencySelect.addEventListener('change', function (e) {
+            amountCurrencyLabel.textContent = e.target.value;
+        });
 
-        // 2. 处理滑动条动态更新
+        // 滑动条
         const slider = document.getElementById('riskSlider');
         const riskValueDisplay = document.getElementById('riskValueDisplay');
         const riskLabelDisplay = document.getElementById('riskLabelDisplay');
 
         function updateRiskDisplay(value) {
-            const numValue = parseInt(value);
-            let label = "Balanced";
-            let colorClass = "text-yellow-600";
-
-            if (numValue < 33) {
-                label = "Conservative";
-                colorClass = "text-green-600";
-            } else if (numValue >= 67) {
-                label = "Aggressive";
-                colorClass = "text-red-600";
-            }
-
-            if (riskValueDisplay && riskLabelDisplay) {
-                riskValueDisplay.textContent = numValue + "%";
-                riskLabelDisplay.textContent = label;
-                riskValueDisplay.className = `text-5xl font-bold ${colorClass}`;
-                riskLabelDisplay.className = `text-2xl font-bold ${colorClass}`;
-            }
+            const n = parseInt(value);
+            let label = "Balanced", color = "text-yellow-600";
+            if (n < 33) { label = "Conservative"; color = "text-green-600"; }
+            else if (n >= 67) { label = "Aggressive"; color = "text-red-600"; }
+            riskValueDisplay.textContent = n + "%";
+            riskLabelDisplay.textContent = label;
+            riskValueDisplay.className = "text-5xl font-bold " + color;
+            riskLabelDisplay.className = "text-2xl font-bold " + color;
         }
 
-        if (slider) {
-            slider.addEventListener('input', (e) => {
-                updateRiskDisplay(e.target.value);
-            });
-        }
+        slider.addEventListener('input', e => updateRiskDisplay(e.target.value));
 
-        // 3. 处理表单提交并跳转
-        const dataInputForm = document.getElementById('dataInputForm');
-        if (dataInputForm) {
-            dataInputForm.addEventListener('submit', function(e) {
-                e.preventDefault(); 
-                
-                const amountVal = document.getElementById('amount').value;
-                const periodVal = document.getElementById('period').value;
-                const currencyVal = document.getElementById('currency').value;
-                const sliderVal = document.getElementById('riskSlider').value;
-
-                localStorage.setItem("unsettledAmount", amountVal);
-                localStorage.setItem("settlementPeriod", periodVal);
-                localStorage.setItem("preferredCurrency", currencyVal);
-                localStorage.setItem("riskTolerance", sliderVal);
-
-                window.location.href = './risk-report.html';
-            });
-        }
+        // 表单提交
+        document.getElementById('dataInputForm').addEventListener('submit', function (e) {
+            e.preventDefault();
+            localStorage.setItem("unsettledAmount", document.getElementById('amount').value);
+            localStorage.setItem("settlementPeriod", document.getElementById('period').value);
+            localStorage.setItem("preferredCurrency", document.getElementById('currency').value);
+            localStorage.setItem("riskTolerance", slider.value);
+            window.location.href = './risk-report.html';
+        });
     </script>
 </body>
 </html>
