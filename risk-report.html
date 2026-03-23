@@ -179,7 +179,43 @@
                 </li>
             </ul>
         </div>
+<div class="bg-white p-8 rounded-lg shadow-sm border border-gray-200 mb-8">
+    <div class="mb-6">
+        <h2 class="text-3xl font-extrabold text-[#0A2463] mb-5 flex items-center gap-3">
+            <span>📊</span> Current Recommendation: Settle 70%, Keep 30% Exposure
+        </h2>
+        <div class="text-gray-700 space-y-3 text-lg bg-blue-50/50 p-6 rounded-md border border-blue-100">
+            <p class="font-semibold text-gray-800">Based on your <span class="text-[#0A2463]">[Conservative]</span> risk profile:</p>
+            <ul class="list-disc pl-6 space-y-2 mt-2">
+                <li>
+                    <span class="font-bold text-gray-900">Settle 70% Now:</span> 
+                    Estimated <span class="font-bold text-[#1D9E75]">¥70,000</span> secured, locking in guaranteed returns.
+                </li>
+                <li>
+                    <span class="font-bold text-gray-900">Hold 30% Exposure:</span> 
+                    If the rate reaches 1.76 within 14 days, potential extra gain of <span class="font-bold text-[#1D9E75]">~¥3,000</span>.
+                </li>
+                <li>
+                    <span class="font-bold text-gray-900">Worst-case Scenario (80% prob.):</span> 
+                    If the rate drops to 1.72, potential extra loss of <span class="font-bold text-[#E24B4A]">~¥2,500</span>.
+                </li>
+            </ul>
+        </div>
+    </div>
 
+    <div class="border-t border-gray-200 pt-4 mt-6">
+        <button id="toggleAnalysisBtn" class="text-sm text-gray-500 hover:text-[#0A2463] font-medium flex items-center gap-1 transition-colors outline-none">
+            View Analysis Basis 
+            <svg id="analysisChevron" class="w-4 h-4 transition-transform duration-200" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7"></path></svg>
+        </button>
+        <div id="analysisContent" class="hidden mt-4 bg-gray-50 p-5 rounded text-xs text-gray-500 space-y-3 border border-gray-100 shadow-inner">
+            <p><span class="font-semibold text-gray-700">Current Volatility (σ):</span> 4.2% (based on 30-day historical data)</p>
+            <p><span class="font-semibold text-gray-700">Confidence Interval:</span> 80% probability exchange rate will fluctuate within [1.72, 1.78]</p>
+            <p><span class="font-semibold text-gray-700">Model:</span> GJR-GARCH, accounting for asymmetric effects of negative shocks</p>
+            <p><span class="font-semibold text-gray-700">Data Source:</span> Bank of China official exchange rates, updated to March 23, 2026</p>
+        </div>
+    </div>
+</div>
         <button id="strategyBtn" class="w-full h-14 bg-[#0a2463] hover:bg-[#1e3a8a] text-white font-bold text-lg rounded-md transition-colors flex items-center justify-center mb-6">
             View Recommended Strategy
             <i data-lucide="arrow-right" class="w-5 h-5 ml-2"></i>
@@ -363,5 +399,76 @@
             window.location.href = 'strategy.html';
         });
     </script>
+<script src="./tier-manager.js"></script>
+
+
+<div id="disclaimerModal" class="fixed inset-0 bg-black bg-opacity-50 hidden items-center justify-center z-[9999]">
+    <div class="bg-white rounded-lg shadow-2xl p-8 max-w-md w-full border-t-8 border-gray-400 relative">
+        <button id="closeDisclaimerBtn" class="absolute top-4 right-4 text-gray-400 hover:text-gray-700 focus:outline-none">
+            <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"></path></svg>
+        </button>
+        
+        <div class="flex items-center gap-3 mb-4">
+            <div class="bg-gray-100 p-2 rounded-full">
+                <span class="text-xl font-bold text-gray-600 px-2">?</span>
+            </div>
+            <h2 class="text-xl font-bold text-gray-800">Disclaimer</h2>
+        </div>
+        
+        <p class="text-gray-600 mb-6 text-sm leading-relaxed">
+            This analysis is based on historical exchange rate statistical patterns and does not constitute investment advice. The model cannot predict structural shocks such as central bank policy changes or geopolitical events. A conservative strategy is recommended prior to major political milestones.
+        </p>
+        
+        <a href="https://www.bloomberg.com/markets/currencies" target="_blank" class="text-[#0A2463] hover:underline text-sm font-semibold flex items-center gap-1">
+            Learn more: View recent financial news 
+            <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M14 5l7 7m0 0l-7 7m7-7H3"></path></svg>
+        </a>
+    </div>
+</div>
+
+<script>
+    document.addEventListener('DOMContentLoaded', () => {
+        // 1. 控制“分析依据”折叠面板 (接续上一个功能的逻辑)
+        const toggleBtn = document.getElementById('toggleAnalysisBtn');
+        const content = document.getElementById('analysisContent');
+        const chevron = document.getElementById('analysisChevron');
+
+        if (toggleBtn && content && chevron) {
+            toggleBtn.addEventListener('click', () => {
+                content.classList.toggle('hidden');
+                if (content.classList.contains('hidden')) {
+                    chevron.style.transform = 'rotate(0deg)';
+                } else {
+                    chevron.style.transform = 'rotate(180deg)';
+                }
+            });
+        }
+
+        // 2. 控制新的免责声明弹窗
+        const disclaimerBtn = document.getElementById('disclaimerBtn');
+        const disclaimerModal = document.getElementById('disclaimerModal');
+        const closeDisclaimerBtn = document.getElementById('closeDisclaimerBtn');
+
+        if (disclaimerBtn && disclaimerModal && closeDisclaimerBtn) {
+            disclaimerBtn.addEventListener('click', () => {
+                disclaimerModal.classList.remove('hidden');
+                disclaimerModal.classList.add('flex');
+            });
+
+            closeDisclaimerBtn.addEventListener('click', () => {
+                disclaimerModal.classList.add('hidden');
+                disclaimerModal.classList.remove('flex');
+            });
+
+            disclaimerModal.addEventListener('click', (e) => {
+                if (e.target === disclaimerModal) {
+                    disclaimerModal.classList.add('hidden');
+                    disclaimerModal.classList.remove('flex');
+                }
+            });
+        }
+    });
+</script>
+
 </body>
 </html>

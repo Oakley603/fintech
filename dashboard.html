@@ -121,6 +121,86 @@
             </div>
         </div>
 
+<div class="grid grid-cols-1 lg:grid-cols-3 gap-6 mb-8 mt-8">
+    
+    <!-- Settings Panel -->
+    <div id="alertSettingsPanel" class="bg-white p-6 rounded-lg shadow border border-gray-100 col-span-1 flex flex-col">
+        <div class="flex justify-between items-center mb-6">
+            <h3 class="text-xl font-bold text-[#0A2463]">Alert Settings</h3>
+            <button id="demoAlertBtn" class="bg-yellow-100 text-yellow-700 text-xs font-bold px-3 py-1 rounded hover:bg-yellow-200 border border-yellow-300">
+                Simulate Alert
+            </button>
+        </div>
+        
+        <div class="space-y-4 flex-grow">
+            <div>
+                <label class="block text-sm font-medium text-gray-700 mb-1">Currency Pair</label>
+                <select id="alertCurrency" class="w-full border-gray-300 rounded-md shadow-sm p-2 border focus:border-[#0A2463] focus:ring focus:ring-[#0A2463] focus:ring-opacity-50">
+                    <option value="CNY-MYR">CNY / MYR</option>
+                    <option value="CNY-SGD">CNY / SGD</option>
+                    <option value="CNY-THB">CNY / THB</option>
+                </select>
+            </div>
+            <div>
+                <label class="block text-sm font-medium text-[#E24B4A] mb-1">Floor Rate (Warning)</label>
+                <input type="number" value="1.72" step="0.01" class="w-full border-gray-300 rounded-md shadow-sm p-2 border focus:border-[#E24B4A] focus:ring focus:ring-red-200">
+            </div>
+            <div>
+                <label class="block text-sm font-medium text-[#1D9E75] mb-1">Target Rate (Alert)</label>
+                <input type="number" value="1.78" step="0.01" class="w-full border-gray-300 rounded-md shadow-sm p-2 border focus:border-[#1D9E75] focus:ring focus:ring-green-200">
+            </div>
+            <div class="pt-2">
+                <button class="w-full bg-[#0A2463] text-white font-bold py-2 rounded hover:bg-blue-900 transition-colors">
+                    Save Settings
+                </button>
+            </div>
+        </div>
+    </div>
+
+    <!-- Chart Panel -->
+<div id="alertChartPanel" class="bg-white p-6 rounded-lg shadow border border-gray-100 col-span-2 flex flex-col transition-all">
+        <h3 class="text-xl font-bold text-[#0A2463] mb-5">Market Trends (30-Day % Change)</h3>
+        
+        <div class="grid grid-cols-1 md:grid-cols-3 gap-4 mb-6">
+            <div id="rateCardMYR" class="bg-blue-50/50 border border-blue-100 p-4 rounded-lg shadow-sm">
+                <div class="text-sm text-gray-500 font-bold mb-1">CNY / MYR</div>
+                <div class="text-2xl font-extrabold text-[#0a2463] mb-1">1.7250</div>
+                <div class="flex items-center text-sm font-bold text-[#E24B4A]">
+                    <i data-lucide="trending-down" class="w-4 h-4 mr-1"></i> -2.4%
+                </div>
+            </div>
+            <div id="rateCardSGD" class="bg-white border border-gray-200 p-4 rounded-lg shadow-sm">
+                <div class="text-sm text-gray-500 font-bold mb-1">CNY / SGD</div>
+                <div class="text-2xl font-extrabold text-gray-800 mb-1">5.3420</div>
+                <div class="flex items-center text-sm font-bold text-[#1D9E75]">
+                    <i data-lucide="trending-up" class="w-4 h-4 mr-1"></i> +1.8%
+                </div>
+            </div>
+            <div id="rateCardTHB" class="bg-white border border-gray-200 p-4 rounded-lg shadow-sm">
+                <div class="text-sm text-gray-500 font-bold mb-1">CNY / THB</div>
+                <div class="text-2xl font-extrabold text-gray-800 mb-1">4.9810</div>
+                <div class="flex items-center text-sm font-bold text-[#1D9E75]">
+                    <i data-lucide="trending-up" class="w-4 h-4 mr-1"></i> +0.9%
+                </div>
+            </div>
+        </div>
+
+        <div class="flex flex-wrap gap-2 mb-4 border-b border-gray-100 pb-3">
+            <button id="tabMYR" class="px-5 py-2 text-sm font-bold rounded-md bg-[#0a2463] text-white transition-colors shadow-sm">CNY/MYR</button>
+            <button id="tabSGD" class="px-5 py-2 text-sm font-bold rounded-md bg-gray-50 text-gray-600 hover:bg-gray-100 transition-colors flex items-center gap-1 border border-gray-200">CNY/SGD <i data-lucide="lock" class="w-3.5 h-3.5 tab-lock"></i></button>
+            <button id="tabTHB" class="px-5 py-2 text-sm font-bold rounded-md bg-gray-50 text-gray-600 hover:bg-gray-100 transition-colors flex items-center gap-1 border border-gray-200">CNY/THB <i data-lucide="lock" class="w-3.5 h-3.5 tab-lock"></i></button>
+            <button id="tabCompare" class="px-5 py-2 text-sm font-bold rounded-md bg-gray-50 text-gray-600 hover:bg-gray-100 transition-colors flex items-center gap-1 border border-gray-200">Compare All <i data-lucide="layers" class="w-3.5 h-3.5 ml-1"></i><i data-lucide="lock" class="w-3.5 h-3.5 tab-lock"></i></button>
+        </div>
+
+        <div class="relative w-full flex-grow min-h-[280px]">
+            <canvas id="multiFxChart"></canvas>
+        </div>
+    </div>
+ </div>
+        </div>
+    </div>
+
+
         <!-- 第三排：快捷操作区 -->
         <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
             <!-- 发起风险评估 -->
@@ -153,6 +233,8 @@
             </div>
         </div>
     </div>
+
+
 
     <!-- 移动端底部导航 -->
     <div class="lg:hidden fixed bottom-0 left-0 right-0 bg-white border-t border-gray-200 px-6 py-3 flex justify-between items-center z-50">
@@ -300,5 +382,130 @@
             activityContainer.appendChild(listDiv);
         }
     </script>
+<script src="./tier-manager.js"></script>
+<div id="alertModal" class="fixed inset-0 bg-black bg-opacity-50 hidden items-center justify-center z-[9999]">
+        <div class="bg-white rounded-[12px] p-[24px] max-w-[400px] w-full mx-4 shadow-2xl relative">
+            <h2 class="text-xl font-bold text-[#E24B4A] mb-3 flex items-center gap-2">
+                ⚠️ Exchange Rate Alert
+            </h2>
+            
+            <p class="text-gray-600 mb-6 text-base leading-relaxed">
+                The CNY/MYR exchange rate has reached your set floor of <span class="font-bold text-[#E24B4A]">1.72</span>. We recommend reviewing your risk report to re-evaluate your settlement strategy.
+            </p>
+            
+            <div class="flex flex-col gap-3">
+                <button onclick="window.location.href='./risk-report.html'" class="w-full bg-[#0a2463] hover:bg-blue-900 text-white font-bold py-3 px-4 rounded transition-colors text-center">
+                    View Risk Report
+                </button>
+                <button id="ignoreAlertBtn" class="w-full bg-transparent border border-gray-300 hover:bg-gray-50 text-gray-700 font-bold py-3 px-4 rounded transition-colors">
+                    Dismiss
+                </button>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        document.addEventListener('DOMContentLoaded', () => {
+            const demoAlertBtn = document.getElementById('demoAlertBtn');
+            const alertModal = document.getElementById('alertModal');
+            const ignoreAlertBtn = document.getElementById('ignoreAlertBtn');
+
+            // 1. 模拟触发预警
+            if (demoAlertBtn && alertModal) {
+                demoAlertBtn.addEventListener('click', () => {
+                    console.log('弹窗触发'); // 满足你的调试要求，确认事件已绑定
+                    alertModal.classList.remove('hidden');
+                    alertModal.classList.add('flex');
+                });
+            }
+
+            // 2. 点击“暂时忽略”关闭弹窗
+            if (ignoreAlertBtn && alertModal) {
+                ignoreAlertBtn.addEventListener('click', () => {
+                    alertModal.classList.add('hidden');
+                    alertModal.classList.remove('flex');
+                });
+            }
+
+            // 3. 点击半透明背景遮罩层也能关闭弹窗
+            if (alertModal) {
+                alertModal.addEventListener('click', (e) => {
+                    if (e.target === alertModal) {
+                        alertModal.classList.add('hidden');
+                        alertModal.classList.remove('flex');
+                    }
+                });
+            }
+        });
+
+    </script>
+<script>
+        document.addEventListener('DOMContentLoaded', () => {
+            const ctx = document.getElementById('multiFxChart');
+            if(!ctx) return;
+
+            const labels = ['T-30', 'T-25', 'T-20', 'T-15', 'T-10', 'T-5', 'Today'];
+            
+            // 归一化后的 % 涨跌幅模拟数据
+            const dataMYR = { label: 'CNY/MYR', data: [0, -0.4, -0.8, -1.2, -1.5, -2.0, -2.4], borderColor: '#0A2463', backgroundColor: '#0A2463', borderWidth: 3, tension: 0.4 };
+            const dataSGD = { label: 'CNY/SGD', data: [0, 0.3, 0.6, 0.2, 1.1, 1.5, 1.8], borderColor: '#1D9E75', backgroundColor: '#1D9E75', borderWidth: 3, tension: 0.4 };
+            const dataTHB = { label: 'CNY/THB', data: [0, 0.5, 1.2, 0.8, -0.5, 0.2, 0.9], borderColor: '#E8A020', backgroundColor: '#E8A020', borderWidth: 3, tension: 0.4 };
+
+            let multiChart = new Chart(ctx, {
+                type: 'line',
+                data: { labels: labels, datasets: [dataMYR] }, // 默认只加载 MYR
+                options: {
+                    responsive: true, maintainAspectRatio: false,
+                    scales: {
+                        y: {
+                            ticks: { 
+                                font: { weight: 'bold' },
+                                callback: function(value) { return (value > 0 ? '+' : '') + value + '%'; } 
+                            },
+                            grid: { borderDash: [4, 4], color: '#f3f4f6' }
+                        },
+                        x: { grid: { display: false } }
+                    },
+                    plugins: { 
+                        legend: { position: 'top', labels: { usePointStyle: true, boxWidth: 8 } },
+                        tooltip: { callbacks: { label: function(ctx) { return ctx.dataset.label + ': ' + (ctx.raw > 0 ? '+' : '') + ctx.raw + '%'; } } }
+                    }
+                }
+            });
+
+            // 标签切换逻辑
+            const tabConfigs = {
+                'tabMYR': [dataMYR],
+                'tabSGD': [dataSGD],
+                'tabTHB': [dataTHB],
+                'tabCompare': [dataMYR, dataSGD, dataTHB]
+            };
+
+            Object.keys(tabConfigs).forEach(tabId => {
+                const btn = document.getElementById(tabId);
+                if(btn) {
+                    btn.addEventListener('click', function() {
+                        if(this.disabled) return; // 拦截置灰点击
+                        
+                        // 重置所有按钮样式
+                        document.querySelectorAll('[id^="tab"]').forEach(t => {
+                            if(!t.disabled) {
+                                t.className = 'px-5 py-2 text-sm font-bold rounded-md bg-gray-50 text-gray-600 hover:bg-gray-100 transition-colors flex items-center gap-1 border border-gray-200';
+                            }
+                        });
+                        
+                        // 激活当前按钮样式
+                        this.className = 'px-5 py-2 text-sm font-bold rounded-md bg-[#0a2463] text-white transition-colors shadow-sm flex items-center gap-1';
+                        
+                        // 更新图表并带动画
+                        multiChart.data.datasets = tabConfigs[tabId];
+                        multiChart.update();
+                    });
+                }
+            });
+        });
+    </script>
+
+<script src="./fx-alert.js"></script>
 </body>
 </html>

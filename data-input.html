@@ -40,6 +40,12 @@
             <p class="text-gray-600 text-lg">Enter your transaction details to analyze your exchange rate risk exposure</p>
         </div>
 
+<div class="bg-blue-50 text-blue-800 text-sm p-3 rounded-md mb-6 flex items-start gap-2 border border-blue-100">
+            <i data-lucide="info" class="w-5 h-5 mt-0.5 shrink-0"></i> 
+            <p>You can change currency pairs at any time. Each analysis is calculated independently.</p>
+        </div>
+
+
         <!-- 进度指示器 -->
         <div class="flex items-center gap-4 mb-12">
             <div class="flex items-center gap-2">
@@ -61,18 +67,33 @@
         <!-- 表单 -->
         <form id="dataInputForm" class="space-y-8">
 
-            <!-- 预期结算金额 -->
-            <div class="space-y-3">
-                <label for="amount" class="text-[#0a2463] font-bold text-lg block">
-                    Expected Settlement Amount
+     <div class="mb-6">
+            <label class="block text-gray-700 font-bold mb-2 text-sm">Currency Pairs (Select 1-3)</label>
+            <div class="space-y-3" id="currencySelectionGroup">
+                <label class="flex items-center justify-between p-3 border border-gray-200 rounded-md cursor-pointer hover:bg-gray-50 transition-colors bg-white shadow-sm">
+                    <div class="flex items-center gap-3">
+                        <input type="checkbox" name="currencyPair" value="MYR" class="w-5 h-5 rounded text-[#0a2463] focus:ring-[#0a2463] transition-all" checked>
+                        <span class="font-bold text-gray-800">CNY / MYR</span>
+                    </div>
                 </label>
-                <div class="relative">
-                    <input type="number" id="amount" placeholder="Enter amount" required min="1"
-                        class="w-full h-14 text-lg border-2 border-gray-300 rounded-md focus:border-[#0a2463] focus:outline-none px-4 pr-16 transition-colors">
-                    <span id="amountCurrencyLabel" class="absolute right-4 top-1/2 -translate-y-1/2 text-gray-500 font-semibold">MYR</span>
-                </div>
-                <p class="text-sm text-gray-500">Enter the total expected settlement amount in your primary currency</p>
+                
+                <label id="labelSGD" class="flex items-center justify-between p-3 border border-gray-200 rounded-md cursor-pointer hover:bg-gray-50 transition-colors bg-white shadow-sm">
+                    <div class="flex items-center gap-3">
+                        <input type="checkbox" id="checkSGD" name="currencyPair" value="SGD" class="w-5 h-5 rounded text-[#0a2463] focus:ring-[#0a2463] transition-all">
+                        <span class="font-bold text-gray-800" id="textSGD">CNY / SGD</span>
+                    </div>
+                    <i data-lucide="lock" id="lockSGD" class="w-4 h-4 text-gray-400 hidden"></i>
+                </label>
+                
+                <label id="labelTHB" class="flex items-center justify-between p-3 border border-gray-200 rounded-md cursor-pointer hover:bg-gray-50 transition-colors bg-white shadow-sm">
+                    <div class="flex items-center gap-3">
+                        <input type="checkbox" id="checkTHB" name="currencyPair" value="THB" class="w-5 h-5 rounded text-[#0a2463] focus:ring-[#0a2463] transition-all">
+                        <span class="font-bold text-gray-800" id="textTHB">CNY / THB</span>
+                    </div>
+                    <i data-lucide="lock" id="lockTHB" class="w-4 h-4 text-gray-400 hidden"></i>
+                </label>
             </div>
+        </div>
 
             <!-- 结算周期 -->
             <div class="space-y-3">
@@ -103,6 +124,9 @@
                     <option value="GBP">GBP - British Pound</option>
                 </select>
                 <p class="text-sm text-gray-500">The currency you will receive after settlement</p>
+            </div>
+
+<div id="currencyInputGroups" class="space-y-4 mb-8 mt-2">
             </div>
 
             <!-- 风险承受能力 -->
@@ -142,7 +166,6 @@
                 </div>
             </div>
 
-            <!-- 提交按钮 -->
             <div class="pt-6">
                 <button type="submit"
                     class="w-full h-14 bg-[#0a2463] hover:bg-[#1e3a8a] text-white font-bold text-lg rounded-md transition-colors">
@@ -152,7 +175,6 @@
         </form>
     </div>
 
-    <!-- 移动端底部导航 -->
     <div class="lg:hidden fixed bottom-0 left-0 right-0 bg-white border-t border-gray-200 px-6 py-3 flex justify-between items-center z-50">
         <a href="dashboard.html" class="flex flex-col items-center text-gray-400">
             <i data-lucide="layout-dashboard" class="w-6 h-6"></i>
@@ -172,51 +194,196 @@
         </a>
     </div>
 
+    <script src="./tier-manager.js"></script>
+
     <script>
-        lucide.createIcons();
-
-        // 读取保存的货币偏好
-        const savedCurrency = localStorage.getItem("preferredCurrency");
-        const amountCurrencyLabel = document.getElementById('amountCurrencyLabel');
-        const currencySelect = document.getElementById('currency');
-
-        if (savedCurrency) {
-            currencySelect.value = savedCurrency;
-            amountCurrencyLabel.textContent = savedCurrency;
+        // 初始化图标
+        if (typeof lucide !== 'undefined') {
+            lucide.createIcons();
         }
 
-        // 货币切换时更新标签
-        currencySelect.addEventListener('change', function (e) {
-            amountCurrencyLabel.textContent = e.target.value;
-        });
-
-        // 滑动条
+        // ==========================================
+        // A. 风险滑块与颜色动态联动 (补回了你丢失的代码)
+        // ==========================================
         const slider = document.getElementById('riskSlider');
         const riskValueDisplay = document.getElementById('riskValueDisplay');
         const riskLabelDisplay = document.getElementById('riskLabelDisplay');
 
-        function updateRiskDisplay(value) {
-            const n = parseInt(value);
-            let label = "Balanced", color = "text-yellow-600";
-            if (n < 33) { label = "Conservative"; color = "text-green-600"; }
-            else if (n >= 67) { label = "Aggressive"; color = "text-red-600"; }
-            riskValueDisplay.textContent = n + "%";
-            riskLabelDisplay.textContent = label;
-            riskValueDisplay.className = "text-5xl font-bold " + color;
-            riskLabelDisplay.className = "text-2xl font-bold " + color;
+        if (slider && riskValueDisplay && riskLabelDisplay) {
+            function updateRiskDisplay(value) {
+                const n = parseInt(value);
+                let label = "Balanced";
+                let color = "text-yellow-600";
+
+                if (n <= 33) {
+                    label = "Conservative";
+                    color = "text-green-600";
+                } else if (n >= 67) {
+                    label = "Aggressive";
+                    color = "text-red-600";
+                }
+
+                riskValueDisplay.textContent = n + '%';
+                riskLabelDisplay.textContent = label;
+                riskValueDisplay.className = `text-5xl font-bold ${color} transition-all duration-200`;
+                riskLabelDisplay.className = `text-2xl font-bold ${color} transition-all duration-200`;
+            }
+
+            // 监听用户滑动
+            slider.addEventListener('input', e => updateRiskDisplay(e.target.value));
+            // 页面加载时初始化一次颜色
+            updateRiskDisplay(slider.value);
         }
 
-        slider.addEventListener('input', e => updateRiskDisplay(e.target.value));
+        // ==========================================
+        // B. 权限管理与多货币动态表单渲染
+        // ==========================================
+        const checkSGD = document.getElementById('checkSGD');
+        const checkTHB = document.getElementById('checkTHB');
+        const labelSGD = document.getElementById('labelSGD');
+        const labelTHB = document.getElementById('labelTHB');
+        const currencyInputGroups = document.getElementById('currencyInputGroups');
+        
+        // 1. 档位置灰限制
+        const tier = localStorage.getItem('fx_userTier') || 'free';
+        if (tier === 'free' || tier === 'basic') {
+            [checkSGD, checkTHB].forEach(chk => { if(chk) { chk.disabled = true; chk.checked = false; }});
+            [labelSGD, labelTHB].forEach(lbl => {
+                if(lbl) {
+                    lbl.classList.add('opacity-50', 'cursor-not-allowed', 'bg-gray-50');
+                    lbl.classList.remove('hover:bg-gray-50', 'cursor-pointer');
+                    lbl.title = "Upgrade to Pro tier to unlock"; 
+                }
+            });
+            const lock1 = document.getElementById('lockSGD'), lock2 = document.getElementById('lockTHB');
+            if(lock1) lock1.classList.remove('hidden');
+            if(lock2) lock2.classList.remove('hidden');
+            const txt1 = document.getElementById('textSGD'), txt2 = document.getElementById('textTHB');
+            if(txt1 && !txt1.innerText.includes('Pro')) txt1.innerText += ' (Pro Only)';
+            if(txt2 && !txt2.innerText.includes('Pro')) txt2.innerText += ' (Pro Only)';
+        }
 
-        // 表单提交
-        document.getElementById('dataInputForm').addEventListener('submit', function (e) {
-            e.preventDefault();
-            localStorage.setItem("unsettledAmount", document.getElementById('amount').value);
-            localStorage.setItem("settlementPeriod", document.getElementById('period').value);
-            localStorage.setItem("preferredCurrency", document.getElementById('currency').value);
-            localStorage.setItem("riskTolerance", slider.value);
-            window.location.href = './risk-report.html';
+        // 2. 动态渲染输入组
+        const colorConfig = {
+            'MYR': { border: 'border-[#0a2463]', text: 'text-[#0a2463]' },
+            'SGD': { border: 'border-[#1D9E75]', text: 'text-[#1D9E75]' },
+            'THB': { border: 'border-[#E8A020]', text: 'text-[#E8A020]' }
+        };
+
+        function renderInputGroups() {
+            if(!currencyInputGroups) return;
+            currencyInputGroups.innerHTML = ''; 
+            const selectedPairs = Array.from(document.querySelectorAll('input[name="currencyPair"]:checked')).map(cb => cb.value);
+            
+            selectedPairs.forEach(currency => {
+                const colors = colorConfig[currency];
+                const tempAmount = localStorage.getItem(`draft_amount_${currency}`) || '';
+                const tempPeriod = localStorage.getItem(`draft_period_${currency}`) || '30';
+
+                const groupHtml = `
+                <div id="group_${currency}" class="bg-white p-5 rounded-md border-l-4 ${colors.border} shadow-sm border-y border-r border-gray-100 transition-all mb-4">
+                    <h4 class="font-bold mb-4 ${colors.text} flex items-center gap-2">
+                        <i data-lucide="coins" class="w-4 h-4"></i> CNY / ${currency}
+                    </h4>
+                    <div class="grid grid-cols-1 md:grid-cols-2 gap-5">
+                        <div>
+                            <label class="block text-sm font-medium text-gray-700 mb-1">Settlement Amount</label>
+                            <div class="relative">
+                                <input type="number" id="amount_${currency}" value="${tempAmount}" class="w-full border-gray-300 rounded-md shadow-sm p-2.5 pr-12 border focus:border-blue-500 focus:ring focus:ring-blue-200 outline-none" required>
+                                <span class="absolute right-3 top-3 text-gray-500 text-sm font-semibold">${currency}</span>
+                            </div>
+                        </div>
+                        <div>
+                            <label class="block text-sm font-medium text-gray-700 mb-1">Settlement Period</label>
+                            <div class="relative">
+                                <input type="number" id="period_${currency}" value="${tempPeriod}" class="w-full border-gray-300 rounded-md shadow-sm p-2.5 pr-16 border focus:border-blue-500 focus:ring focus:ring-blue-200 outline-none" required>
+                                <span class="absolute right-3 top-3 text-gray-500 text-sm font-semibold">Days</span>
+                            </div>
+                        </div>
+                    </div>
+                </div>`;
+                currencyInputGroups.insertAdjacentHTML('beforeend', groupHtml);
+
+                // 暂存草稿
+                document.getElementById(`amount_${currency}`).addEventListener('input', (e) => localStorage.setItem(`draft_amount_${currency}`, e.target.value));
+                document.getElementById(`period_${currency}`).addEventListener('input', (e) => localStorage.setItem(`draft_period_${currency}`, e.target.value));
+            });
+            
+            if(typeof lucide !== 'undefined') lucide.createIcons();
+        }
+
+        // 3. 记忆上一次勾选状态
+        try {
+            const savedPairs = JSON.parse(localStorage.getItem("selectedCurrencies"));
+            if (savedPairs && Array.isArray(savedPairs)) {
+                document.querySelectorAll('input[name="currencyPair"]').forEach(chk => {
+                    if (savedPairs.includes(chk.value) && !chk.disabled) chk.checked = true;
+                    else if (!savedPairs.includes(chk.value)) chk.checked = false;
+                });
+            }
+        } catch(e) {}
+
+        document.querySelectorAll('input[name="currencyPair"]').forEach(chk => {
+            chk.addEventListener('change', renderInputGroups);
         });
+
+        renderInputGroups(); // 页面加载时执行一次
+
+        // ==========================================
+        // C. 表单提交控制
+        // ==========================================
+        const form = document.getElementById('dataInputForm');
+        if (form) {
+            form.addEventListener('submit', function (e) {
+                e.preventDefault();
+                
+                const selectedPairs = Array.from(document.querySelectorAll('input[name="currencyPair"]:checked')).map(cb => cb.value);
+                if (selectedPairs.length === 0) {
+                    alert("Please select at least one currency pair for analysis.");
+                    return;
+                }
+
+                const currencyInputs = [];
+                for (let curr of selectedPairs) {
+                    const amt = document.getElementById(`amount_${curr}`).value;
+                    const prd = document.getElementById(`period_${curr}`).value;
+                    
+                    if (!amt || !prd) {
+                        alert(`Please fill in both amount and period for CNY/${curr}.`);
+                        return;
+                    }
+                    currencyInputs.push({ currency: curr, amount: parseFloat(amt), period: parseInt(prd) });
+                }
+
+                localStorage.setItem("selectedCurrencies", JSON.stringify(selectedPairs));
+                localStorage.setItem("currencyInputs", JSON.stringify(currencyInputs));
+                
+                const fallbackCurr = selectedPairs.includes('MYR') ? 'MYR' : selectedPairs[0];
+                localStorage.setItem("preferredCurrency", fallbackCurr);
+                localStorage.setItem("unsettledAmount", document.getElementById(`amount_${fallbackCurr}`).value);
+                localStorage.setItem("settlementPeriod", document.getElementById(`period_${fallbackCurr}`).value);
+                
+                if(slider) localStorage.setItem("riskTolerance", slider.value);
+                
+                window.location.href = './risk-report.html';
+            });
+        }
+
+        // ==========================================
+        // D. 强制唤起右上角控制台 (防止丢失)
+        // ==========================================
+        setTimeout(() => {
+            if (typeof initTierUI === 'function' && !document.getElementById('tierSelector')) {
+                initTierUI();
+                const selector = document.getElementById('tierSelector');
+                if (selector) {
+                    selector.addEventListener('change', (e) => {
+                        localStorage.setItem('fx_userTier', e.target.value);
+                        location.reload();
+                    });
+                }
+            }
+        }, 100);
     </script>
 </body>
 </html>

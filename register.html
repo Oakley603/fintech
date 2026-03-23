@@ -121,23 +121,23 @@
                         class="w-full h-12 px-3 border-2 border-gray-300 rounded-md focus:border-[#0a2463] focus:outline-none transition-colors">
                 </div>
 
-                <!-- 结算货币 -->
-                <div class="space-y-2">
-                    <label for="currency" class="text-[#0a2463] font-semibold block text-sm">Primary Settlement Currency</label>
-                    <select id="currency" required
-                        class="w-full h-12 px-3 border-2 border-gray-300 rounded-md focus:border-[#0a2463] focus:outline-none bg-white transition-colors cursor-pointer">
-                        <option value="" disabled selected>Select your currency</option>
-                        <option value="CNY">CNY - Chinese Yuan Renminbi</option>
-                        <option value="MYR">MYR - Malaysian Ringgit</option>
-                        <option value="THB">THB - Thai Baht</option>
-                        <option value="IDR">IDR - Indonesian Rupiah</option>
-                        <option value="VND">VND - Vietnamese Dong</option>
-                        <option value="SGD">SGD - Singapore Dollar</option>
-                        <option value="PHP">PHP - Philippine Peso</option>
-                        <option value="EUR">EUR - Euro</option>
-                        <option value="GBP">GBP - British Pound</option>
-                    </select>
+                <div class="mb-5">
+                <label class="block text-gray-700 font-bold mb-2 text-sm">Target Markets (Optional)</label>
+                <div class="grid grid-cols-2 gap-3 text-sm">
+                    <label class="flex items-center gap-2 cursor-pointer text-gray-600">
+                        <input type="checkbox" value="Malaysia" class="rounded text-[#0a2463] focus:ring-[#0a2463]"> Malaysia
+                    </label>
+                    <label class="flex items-center gap-2 cursor-pointer text-gray-600">
+                        <input type="checkbox" value="Singapore" class="rounded text-[#0a2463] focus:ring-[#0a2463]"> Singapore
+                    </label>
+                    <label class="flex items-center gap-2 cursor-pointer text-gray-600">
+                        <input type="checkbox" value="Thailand" class="rounded text-[#0a2463] focus:ring-[#0a2463]"> Thailand
+                    </label>
+                    <label class="flex items-center gap-2 cursor-pointer text-gray-600">
+                        <input type="checkbox" value="Other" class="rounded text-[#0a2463] focus:ring-[#0a2463]"> Other
+                    </label>
                 </div>
+            </div>
 
                 <!-- 平台选择 -->
                 <div class="space-y-2">
@@ -204,12 +204,7 @@
             // 保存用户数据到本地缓存
             localStorage.setItem("registeredAccount", account);
             
-            const currency = document.getElementById('currency').value;
-            const platformObj = document.getElementById('platform');
-            const platform = platformObj.options[platformObj.selectedIndex].text;
-            
-            localStorage.setItem("preferredCurrency", currency);
-            localStorage.setItem("platform", platform);
+          
 
             alert("Account created successfully! Redirecting to Dashboard...");
             
