@@ -139,6 +139,23 @@
 
         <!-- 策略选择区 (三套方案) -->
         <div id="singleCurrencyRecommendations">
+
+<!-- GJR-GARCH 模型依据横幅 -->
+<div class="bg-blue-50 border border-blue-200 rounded-sm p-4 mb-6 flex flex-wrap gap-4 items-center justify-between">
+    <div class="flex items-center gap-2">
+        <i data-lucide="cpu" class="w-5 h-5 text-[#0a2463]"></i>
+        <span class="text-sm font-bold text-[#0a2463]">GJR-GARCH Model Output</span>
+    </div>
+    <div class="flex flex-wrap gap-4 text-sm">
+        <span class="text-gray-700">Loss Probability: <strong class="text-red-600" id="modelLossProb">50.7%</strong></span>
+        <span class="text-gray-400">|</span>
+        <span class="text-gray-700">Max Loss (90-day): <strong class="text-red-600" id="modelMaxLoss">4.96%</strong></span>
+        <span class="text-gray-400">|</span>
+        <span class="text-gray-700">Volatility Persistence: <strong class="text-[#0a2463]">α+β = 0.9895</strong></span>
+    </div>
+    <span class="text-xs text-gray-400">Based on 3,731 daily observations · Monte Carlo 1,000 simulations</span>
+</div>
+
     <div id="strategyOptions" class="grid grid-cols-1 md:grid-cols-3 gap-6 mb-8"></div>
 </div>
 <div id="multiCurrencyRecommendations" class="hidden flex flex-col items-stretch w-full max-w-4xl mx-auto mb-8 mt-4 transition-all gap-6">
@@ -154,10 +171,10 @@
                     <p class="flex items-center gap-2"><i data-lucide="pie-chart" class="w-5 h-5 text-red-500"></i> <span class="font-bold w-40">Recommended Ratio:</span> 70% Settlement</p>
                     <p class="flex items-center gap-2"><i data-lucide="zap" class="w-5 h-5 text-red-500"></i> <span class="font-bold w-40">Action:</span> Prioritize execution, complete this week.</p>
                     <p class="flex items-center gap-2"><i data-lucide="shield" class="w-5 h-5 text-red-500"></i> <span class="font-bold w-40">Exposure Rule:</span> Keep 30% exposure, set alert to 1.76.</p>
-                    <p class="flex items-center gap-2 mt-4 pt-2"><i data-lucide="check-circle" class="w-5 h-5 text-red-500"></i> <span class="font-bold text-gray-800">Est. Minimum Return:</span> <span class="text-xl font-extrabold text-red-600">¥70,000</span></p>
+                    <p class="flex items-center gap-2 mt-4 pt-2"><i data-lucide="check-circle" class="w-5 h-5 text-red-500"></i> <span class="font-bold text-gray-800">Est. Minimum Return:</span> <span id="multiReturnMYR" class="text-xl font-extrabold text-red-600">¥70,000</span></p>
                 </div>
                 <div class="mt-5 sm:text-right">
-                    <button onclick="window.open('https://www.pingpongx.com/')" class="w-full sm:w-auto bg-[#E24B4A] hover:bg-red-700 text-white font-bold py-2 px-6 rounded transition-colors inline-flex items-center justify-center gap-2 shadow-sm relative z-20 pointer-events-auto cursor-pointer">
+                    <button class="external-execute-btn w-full sm:w-auto bg-[#E24B4A] hover:bg-red-700 text-white font-bold py-2 px-6 rounded transition-colors inline-flex items-center justify-center gap-2 shadow-sm relative z-20 pointer-events-auto cursor-pointer" data-url="https://www.pingpongx.com/">
                         Proceed to PingPong <i data-lucide="arrow-right" class="w-4 h-4"></i>
                     </button>
                 </div>
@@ -174,10 +191,10 @@
                     <p class="flex items-center gap-2"><i data-lucide="pie-chart" class="w-5 h-5 text-yellow-600"></i> <span class="font-bold w-40">Recommended Ratio:</span> 50% Settlement</p>
                     <p class="flex items-center gap-2"><i data-lucide="clock" class="w-5 h-5 text-yellow-600"></i> <span class="font-bold w-40">Action:</span> Execute partially, hold the rest for observation.</p>
                     <p class="flex items-center gap-2"><i data-lucide="shield" class="w-5 h-5 text-yellow-600"></i> <span class="font-bold w-40">Exposure Rule:</span> Keep 50% exposure, monitor daily.</p>
-                    <p class="flex items-center gap-2 mt-4 pt-2"><i data-lucide="check-circle" class="w-5 h-5 text-yellow-600"></i> <span class="font-bold text-gray-800">Est. Minimum Return:</span> <span class="text-xl font-extrabold text-yellow-600">¥45,000</span></p>
+                    <p class="flex items-center gap-2 mt-4 pt-2"><i data-lucide="check-circle" class="w-5 h-5 text-yellow-600"></i> <span class="font-bold text-gray-800">Est. Minimum Return:</span> <span id="multiReturnTHB" class="text-xl font-extrabold text-yellow-600">¥45,000</span></p>
                 </div>
                <div class="mt-5 sm:text-right">
-    <button onclick="window.open('https://www.pingpongx.com/')" class="w-full sm:w-auto bg-yellow-500 hover:bg-yellow-600 text-white font-bold py-2 px-6 rounded transition-colors inline-flex items-center justify-center gap-2 shadow-sm relative z-20 pointer-events-auto cursor-pointer">
+    <button class="external-execute-btn w-full sm:w-auto bg-yellow-500 hover:bg-yellow-600 text-white font-bold py-2 px-6 rounded transition-colors inline-flex items-center justify-center gap-2 shadow-sm relative z-20 pointer-events-auto cursor-pointer" data-url="https://www.pingpongx.com/">
         Proceed to PingPong <i data-lucide="arrow-right" class="w-4 h-4"></i>
     </button>
 </div>
@@ -196,10 +213,10 @@
                     <p class="flex items-center gap-2"><i data-lucide="pie-chart" class="w-5 h-5 text-green-600"></i> <span class="font-bold w-40">Recommended Ratio:</span> 20% Settlement</p>
                     <p class="flex items-center gap-2"><i data-lucide="coffee" class="w-5 h-5 text-green-600"></i> <span class="font-bold w-40">Action:</span> Delay settlement, wait for better rates.</p>
                     <p class="flex items-center gap-2"><i data-lucide="shield" class="w-5 h-5 text-green-600"></i> <span class="font-bold w-40">Exposure Rule:</span> Keep 80% exposure, target rate at 5.45.</p>
-                    <p class="flex items-center gap-2 mt-4 pt-2"><i data-lucide="check-circle" class="w-5 h-5 text-green-600"></i> <span class="font-bold text-gray-800">Est. Minimum Return:</span> <span class="text-xl font-extrabold text-green-600">¥10,000</span></p>
+                    <p class="flex items-center gap-2 mt-4 pt-2"><i data-lucide="check-circle" class="w-5 h-5 text-green-600"></i> <span class="font-bold text-gray-800">Est. Minimum Return:</span><span id="multiReturnSGD" class="text-xl font-extrabold text-green-600">¥10,000</span></p>
                 </div>
                 <div class="mt-5 sm:text-right">
-                    <button onclick="window.open('https://wise.com/')" class="w-full sm:w-auto bg-[#1D9E75] hover:bg-green-700 text-white font-bold py-2 px-6 rounded transition-colors inline-flex items-center justify-center gap-2 shadow-sm relative z-20 pointer-events-auto cursor-pointer">
+                   <button class="external-execute-btn w-full sm:w-auto bg-[#1D9E75] hover:bg-green-700 text-white font-bold py-2 px-6 rounded transition-colors inline-flex items-center justify-center gap-2 shadow-sm relative z-20 pointer-events-auto cursor-pointer" data-url="https://wise.com/">
                         Proceed to Wise <i data-lucide="arrow-right" class="w-4 h-4"></i>
                     </button>
                 </div>
@@ -208,12 +225,12 @@
             <div class="w-full mt-6 bg-[#0a2463] text-white rounded-lg p-6 flex flex-col sm:flex-row justify-between items-center shadow-lg border border-blue-900">
                 <div class="text-lg mb-4 sm:mb-0 text-center sm:text-left">
                     <p class="text-blue-200 text-sm font-bold uppercase tracking-wider mb-1">Total Executed Return</p>
-                    <p class="font-extrabold text-3xl text-[#1D9E75]">¥125,000</p>
+                    <p id="multiTotalReturn" class="font-extrabold text-3xl text-[#1D9E75]">¥125,000</p>
                 </div>
                 <div class="hidden sm:block h-12 border-l-2 border-blue-800/50 mx-6"></div>
                 <div class="text-lg text-center sm:text-right">
                     <p class="text-blue-200 text-sm font-bold uppercase tracking-wider mb-1">Total Remaining Exposure</p>
-                    <p class="font-extrabold text-3xl text-white">¥65,000</p>
+                    <p id="multiTotalRemaining" class="font-extrabold text-3xl text-white">¥65,000</p>
                 </div>
             </div>
         </div>
@@ -316,20 +333,20 @@
             
             <!-- 下拉菜单 (默认隐藏) -->
             <div id="executeDropdown" class="hidden absolute top-full left-0 w-full mt-2 bg-white border-2 border-green-600 rounded-md shadow-xl z-50 overflow-hidden text-left">
-                <a href="https://wise.com" target="_blank" class="flex items-center px-6 py-4 hover:bg-green-50 border-b border-gray-100 transition-colors">
+                <button class="external-execute-btn w-full text-left flex items-center px-6 py-4 hover:bg-green-50 border-b border-gray-100 transition-colors" data-url="https://wise.com">
                     <i data-lucide="external-link" class="w-5 h-5 text-green-600 mr-3"></i>
                     <div>
                         <p class="font-bold text-gray-800">Wise</p>
                         <p class="text-xs text-gray-500">Fast, low-cost international transfers</p>
                     </div>
-                </a>
-                <a href="https://www.pingpongx.com" target="_blank" class="flex items-center px-6 py-4 hover:bg-green-50 transition-colors">
+                </button>
+               <button class="external-execute-btn w-full text-left flex items-center px-6 py-4 hover:bg-green-50 transition-colors" data-url="https://www.pingpongx.com">
                     <i data-lucide="external-link" class="w-5 h-5 text-green-600 mr-3"></i>
                     <div>
                         <p class="font-bold text-gray-800">PingPong</p>
                         <p class="text-xs text-gray-500">Cross-border payment platform for e-commerce</p>
                     </div>
-                </a>
+                </button>
             </div>
         </div>
 
@@ -344,6 +361,33 @@
         <p class="text-center text-sm text-gray-500 mt-3">
             This recommendation is based on statistical models. Results may vary.
         </p>
+
+<div id="executionModal" class="hidden fixed inset-0 z-[100] flex items-center justify-center bg-black bg-opacity-60 backdrop-blur-sm p-4">
+    <div class="bg-white rounded-xl shadow-2xl max-w-lg w-full p-8 relative">
+        <div class="flex items-center gap-3 mb-5 border-b border-gray-100 pb-4">
+            <i data-lucide="alert-triangle" class="w-6 h-6 text-yellow-500"></i>
+            <h3 class="text-2xl font-bold text-[#0a2463]">Confirm Execution</h3>
+        </div>
+        
+        <p class="text-gray-700 text-base mb-4 leading-relaxed">
+            You are about to execute based on your selected risk profile: <strong id="modalRiskProfile" class="text-[#0a2463] uppercase"></strong>. 
+            This strategy prioritizes <strong id="modalRiskPriority" class="text-[#0a2463]"></strong> over maximum gain.
+        </p>
+        
+        <p class="text-gray-600 text-sm mb-8 leading-relaxed bg-gray-50 p-4 rounded-md border-l-4 border-gray-300">
+            Exchange rate movements are inherently unpredictable. Even a wait-and-see approach carries the risk of less favorable outcomes. By proceeding, you acknowledge that this decision is made based on your own risk preference and that FXGuard's role is advisory only.
+        </p>
+        
+        <div class="flex flex-col sm:flex-row justify-end gap-3">
+            <button id="modalCancelBtn" class="px-6 py-3 bg-gray-200 hover:bg-gray-300 text-gray-800 font-bold rounded-md transition-colors w-full sm:w-auto">
+                Cancel
+            </button>
+            <button id="modalConfirmBtn" class="px-6 py-3 bg-[#0a2463] hover:bg-[#1e3a8a] text-white font-bold rounded-md transition-colors w-full sm:w-auto flex justify-center items-center gap-2">
+                Confirm & Proceed <i data-lucide="external-link" class="w-4 h-4"></i>
+            </button>
+        </div>
+    </div>
+</div>
 
     <!-- 交互逻辑 -->
     <script>
@@ -447,7 +491,24 @@
             
             document.getElementById('costRatioDisplay').textContent = estimatedCostRatio;
             document.getElementById('costAmountDisplay').textContent = estimatedCostAmount.toLocaleString(undefined, {maximumFractionDigits: 0});
+// 根据货币显示真实GJR-GARCH模型参数
+const modelParams = {
+    'MYR': { lossProb: '50.7%', maxLoss: '4.96%', alphaBeta: '0.9895', obs: '3,731' },
+    'THB': { lossProb: '50.8%', maxLoss: '4.77%', alphaBeta: '0.9618', obs: '1,918' },
+    'SGD': { lossProb: '47.5%', maxLoss: '2.56%', alphaBeta: '0.9937', obs: '2,721' }
+};
+const mp = modelParams[preferredCurrency] || modelParams['MYR'];
+if(document.getElementById('modelLossProb')) document.getElementById('modelLossProb').textContent = mp.lossProb;
+if(document.getElementById('modelMaxLoss')) document.getElementById('modelMaxLoss').textContent = mp.maxLoss;
+// 同时更新横幅里的 alpha+beta 和观测数
+const banner = document.querySelector('#singleCurrencyRecommendations .bg-blue-50');
+if(banner) {
+    banner.querySelectorAll('strong')[2].textContent = 'α+β = ' + mp.alphaBeta;
+    banner.querySelector('.text-xs.text-gray-400').textContent = 
+        'Based on ' + mp.obs + ' daily observations · Monte Carlo 1,000 simulations';
+}
         }
+
 
         // 初始化
         renderOptions();
@@ -532,6 +593,133 @@ const singleViewBtn = document.getElementById('singleViewBtn');
                 lucide.createIcons();
             });
         }
+
+// ================== 更新：多货币视图计算逻辑 (包含剩余敞口) ==================
+        function updateMultiCurrencyReturns() {
+            // 确保 unsettleAmount 存在，如果没有则默认 100000
+            const currentUnsettledAmount = typeof unsettledAmount !== 'undefined' ? unsettledAmount : 100000;
+            
+            // 定义固定汇率 baseRates
+            const rateMYR = 0.5774;
+            const rateTHB = 5.050;
+            const rateSGD = 0.1852;
+
+            // 1. 计算已对冲部分 (Total Executed Return)
+            // 比例: MYR 70%, THB 50%, SGD 20%
+            const returnMYR = Math.round((currentUnsettledAmount * 0.70) / rateMYR);
+            const returnTHB = Math.round((currentUnsettledAmount * 0.50) / rateTHB);
+            const returnSGD = Math.round((currentUnsettledAmount * 0.20) / rateSGD);
+            const totalReturn = returnMYR + returnTHB + returnSGD;
+
+            // 2. 计算未对冲的剩余敞口部分 (Total Remaining Exposure)
+            // 比例: MYR 30%, THB 50%, SGD 80%
+            const remainMYR = Math.round((currentUnsettledAmount * 0.30) / rateMYR);
+            const remainTHB = Math.round((currentUnsettledAmount * 0.50) / rateTHB);
+            const remainSGD = Math.round((currentUnsettledAmount * 0.80) / rateSGD);
+            const totalRemaining = remainMYR + remainTHB + remainSGD;
+
+            // 3. 获取 HTML 里的对应位置
+            const elMYR = document.getElementById('multiReturnMYR');
+            const elTHB = document.getElementById('multiReturnTHB');
+            const elSGD = document.getElementById('multiReturnSGD');
+            const elTotalReturn = document.getElementById('multiTotalReturn');
+            const elTotalRemaining = document.getElementById('multiTotalRemaining'); // 获取剩余敞口的元素
+
+            // 4. 把算出来的数字格式化并显示出来
+            if(elMYR) elMYR.textContent = '¥' + returnMYR.toLocaleString('en-US');
+            if(elTHB) elTHB.textContent = '¥' + returnTHB.toLocaleString('en-US');
+            if(elSGD) elSGD.textContent = '¥' + returnSGD.toLocaleString('en-US');
+            if(elTotalReturn) elTotalReturn.textContent = '¥' + totalReturn.toLocaleString('en-US');
+            
+            // 更新总剩余敞口显示
+            if(elTotalRemaining) elTotalRemaining.textContent = '¥' + totalRemaining.toLocaleString('en-US');
+        }
+// 页面加载时执行一次计算
+updateMultiCurrencyReturns();
+// ====================================================
+
+// ================== 新增：第三方执行确认弹窗逻辑 ==================
+        const executionModal = document.getElementById('executionModal');
+        const modalCancelBtn = document.getElementById('modalCancelBtn');
+        const modalConfirmBtn = document.getElementById('modalConfirmBtn');
+        const modalRiskProfile = document.getElementById('modalRiskProfile');
+        const modalRiskPriority = document.getElementById('modalRiskPriority');
+        let currentTargetUrl = ''; // 记录当前要跳转的网址
+
+        // 1. 根据 localStorage 里的 riskTolerance 动态判断文案
+        let profileName = "Balanced";
+        let profilePriority = "risk-return balance";
+        
+        // 这里的 riskTolerance 变量已经在页面顶部被获取了
+        if (typeof riskTolerance !== 'undefined') {
+            if (riskTolerance < 33) {
+                profileName = "Conservative";
+                profilePriority = "capital protection";
+            } else if (riskTolerance >= 67) {
+                profileName = "Aggressive";
+                profilePriority = "maximizing upside";
+            }
+        }
+
+        // 把动态文字填入弹窗
+        if (modalRiskProfile) modalRiskProfile.textContent = profileName;
+        if (modalRiskPriority) modalRiskPriority.textContent = profilePriority;
+
+        // 2. 找到所有我们刚刚修改过的 5 个按钮，并加上点击拦截
+        const executeButtons = document.querySelectorAll('.external-execute-btn');
+        executeButtons.forEach(btn => {
+            btn.addEventListener('click', function(e) {
+                e.preventDefault(); // 阻止默认的直接跳转
+                
+                // 获取放在 data-url 里的目标链接
+                currentTargetUrl = this.getAttribute('data-url');
+                
+                // 显示弹窗
+                executionModal.classList.remove('hidden');
+                
+                // 如果是单货币下拉菜单里的按钮，点击后顺便把下拉菜单收起来
+                if (executeDropdown && !executeDropdown.classList.contains('hidden')) {
+                    executeDropdown.classList.add('hidden');
+                    const dropIcon = document.querySelector('#executeBtn i');
+                    if (dropIcon) dropIcon.setAttribute('data-lucide', 'chevron-down');
+                    lucide.createIcons();
+                }
+            });
+        });
+
+        // 3. 取消按钮逻辑
+        if (modalCancelBtn) {
+            modalCancelBtn.addEventListener('click', () => {
+                executionModal.classList.add('hidden'); // 隐藏弹窗
+                currentTargetUrl = ''; // 清空链接
+            });
+        }
+
+        // 4. 确认按钮逻辑：写日志 + 跳转
+        if (modalConfirmBtn) {
+            modalConfirmBtn.addEventListener('click', () => {
+                // 写日志到 activityLog
+                let activityLog = JSON.parse(localStorage.getItem('activityLog')) || [];
+                const executedActivity = {
+                    title: 'Strategy Executed',
+                    // selectedRatio 和 preferredCurrency 已经在页面的其他 JS 中定义了
+                    detail: `${typeof selectedRatio !== 'undefined' ? selectedRatio : 70}% hedged for ${typeof preferredCurrency !== 'undefined' ? preferredCurrency : 'MYR'}`,
+                    time: 'Just now'
+                };
+                activityLog.unshift(executedActivity);
+                if (activityLog.length > 5) activityLog.pop();
+                localStorage.setItem('activityLog', JSON.stringify(activityLog));
+
+                // 隐藏弹窗并在新标签页打开目标链接
+                executionModal.classList.add('hidden');
+                if (currentTargetUrl) {
+                    window.open(currentTargetUrl, '_blank');
+                }
+                currentTargetUrl = '';
+            });
+        }
+        // ===============================================================
+
     </script>
 <script src="./tier-manager.js"></script>
 </body>

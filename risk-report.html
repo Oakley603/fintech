@@ -59,6 +59,14 @@
             <p class="text-gray-600 text-lg">Based on your inputs and our GJR-GARCH model, here's your current exchange rate risk exposure</p>
         </div>
 
+<div id="reportContent">
+
+<div class="flex gap-4 mb-8 border-b-2 border-gray-100 pb-2" id="currencyTabs">
+            <button onclick="switchCurrency('MYR')" id="tab-MYR" class="px-6 py-2 font-bold text-[#0a2463] border-b-4 border-[#0a2463] transition-colors focus:outline-none">CNY / MYR</button>
+            <button onclick="switchCurrency('THB')" id="tab-THB" class="px-6 py-2 font-bold text-gray-400 border-b-4 border-transparent hover:text-[#0a2463] transition-colors focus:outline-none">CNY / THB <span id="lock-THB" class="text-xs">🔒</span></button>
+<button onclick="switchCurrency('SGD')" id="tab-SGD" class="px-6 py-2 font-bold text-gray-400 border-b-4 border-transparent hover:text-[#0a2463] transition-colors focus:outline-none">CNY / SGD <span id="lock-SGD" class="text-xs">🔒</span></button>
+        </div>
+
         <!-- 当前风险敞口 -->
         <div class="bg-[#0a2463] text-white p-8 mb-8 rounded-sm shadow-md">
             <div class="flex items-center gap-3 mb-4">
@@ -96,9 +104,9 @@
                     <i data-lucide="help-circle" class="w-6 h-6"></i>
                 </button>
             </div>
-            <div class="w-full h-[400px]">
-                <canvas id="predictionChart"></canvas>
-            </div>
+            <div class="w-full h-[400px]" id="chartWrapper">
+    <canvas id="predictionChart"></canvas>
+</div>
         </div>
 
         <!-- 情景模拟 -->
@@ -163,7 +171,7 @@
 
         <!-- 摘要盒子 -->
         <div class="bg-gray-100 border-2 border-gray-300 p-8 mb-8 rounded-sm">
-            <h3 class="text-xl font-bold text-[#0a2463] mb-4">Risk Summary</h3>
+            
             <ul class="space-y-2 text-gray-700">
                 <li class="flex items-start gap-2">
                     <span class="text-[#0a2463] font-bold mt-1">•</span>
@@ -199,6 +207,10 @@
                     <span class="font-bold text-gray-900">Worst-case Scenario (80% prob.):</span> 
                     If the rate drops to 1.72, potential extra loss of <span class="font-bold text-[#E24B4A]">~¥2,500</span>.
                 </li>
+<li class="flex items-start gap-2">
+    <span class="text-[#0a2463] font-bold mt-1">•</span>
+    <span><strong>Extreme scenario (CVaR):</strong> In the worst 10% of cases, average loss reaches <strong id="cvarDisplay">--</strong>% — factored into your hedging recommendation.</span>
+</li>
             </ul>
         </div>
     </div>
@@ -217,9 +229,9 @@
     </div>
 </div>
         <button id="strategyBtn" class="w-full h-14 bg-[#0a2463] hover:bg-[#1e3a8a] text-white font-bold text-lg rounded-md transition-colors flex items-center justify-center mb-6">
-            View Recommended Strategy
-            <i data-lucide="arrow-right" class="w-5 h-5 ml-2"></i>
-        </button>
+    View Recommended Strategy
+    <i data-lucide="arrow-right" class="w-5 h-5 ml-2"></i>
+</button>
     </div>
 
     <!-- 免责声明弹窗 -->
@@ -279,6 +291,9 @@
         const unsettledAmount = parseFloat(localStorage.getItem("unsettledAmount")) || 10000;
         const settlementPeriod = parseInt(localStorage.getItem("settlementPeriod")) || 30;
         const preferredCurrency = localStorage.getItem("preferredCurrency") || "MYR";
+        let predictionChartInstance = null; // 用于销毁旧图表
+
+        function renderReport(currency) {
 
         // 2. 真实汇率（来自数据集，CNY为基准：1 CNY = X 外币）
         const rateMap = {
@@ -292,21 +307,19 @@
             'GBP': 0.1118,
             'CNY': 1.0
         };
-        const baseRate = rateMap[preferredCurrency] || 0.5774;
+        const baseRate = rateMap[currency] || 0.5774;
 
         // 3. GJR-GARCH 真实模型参数（基于15年CNY/MYR日数据）
         // 损失率 = 结算金额在该周期内的最大可能损失比例（80%置信区间）
-        const riskParams = {
-            'MYR': { loss30: 0.0216, loss60: 0.0363, loss90: 0.0496,
-                     gain30: 0.0231, gain60: 0.0388, gain90: 0.0528, lossProb: 0.507 },
-            'THB': { loss30: 0.025,  loss60: 0.042,  loss90: 0.058,
-                     gain30: 0.025,  gain60: 0.042,  gain90: 0.058,  lossProb: 0.50 },
-            'IDR': { loss30: 0.028,  loss60: 0.048,  loss90: 0.065,
-                     gain30: 0.028,  gain60: 0.048,  gain90: 0.065,  lossProb: 0.50 },
-            'EUR': { loss30: 0.018,  loss60: 0.030,  loss90: 0.042,
-                     gain30: 0.018,  gain60: 0.030,  gain90: 0.042,  lossProb: 0.50 }
-        };
-        const params = riskParams[preferredCurrency] || riskParams['MYR'];
+       const riskParams = {
+    'MYR': { loss30:0.0216, loss60:0.0363, loss90:0.0496,
+             gain30:0.0231, gain60:0.0388, gain90:0.0528, lossProb:0.507 },
+    'THB': { loss30:0.0294, loss60:0.0400, loss90:0.0477,
+             gain30:0.0294, gain60:0.0400, gain90:0.0477, lossProb:0.508 },
+    'SGD': { loss30:0.0130, loss60:0.0199, loss90:0.0256,
+             gain30:0.0130, gain60:0.0199, gain90:0.0256, lossProb:0.475 }
+};
+        const params = riskParams[currency] || riskParams['MYR'];
 
         // 4. 根据结算周期选择对应参数
         let lossRate, gainRate;
@@ -326,7 +339,7 @@
         const potentialGain = unsettledAmount * gainRate;
 
         // 6. 更新页面
-        document.querySelectorAll('.currency-label').forEach(el => el.textContent = preferredCurrency);
+        document.querySelectorAll('.currency-label').forEach(el => el.textContent = currency);
         document.getElementById('chartTitle').textContent = settlementPeriod;
         document.getElementById('exposureAmount').textContent = unsettledAmount.toLocaleString(undefined, {maximumFractionDigits: 0});
         document.getElementById('localAmount').textContent = unsettledAmount.toLocaleString();
@@ -339,7 +352,15 @@
         document.getElementById('summaryDays').textContent = settlementPeriod;
         document.getElementById('summaryGain').textContent = potentialGain.toLocaleString(undefined, {maximumFractionDigits: 0});
         document.getElementById('summaryLoss').textContent = potentialLoss.toLocaleString(undefined, {maximumFractionDigits: 0});
+const cvarMap = {'MYR': '8.00', 'THB': '7.09', 'SGD': '6.52'};
+const cvarValue = cvarMap[currency] || '8.00';
+document.querySelectorAll('#cvarDisplay').forEach(el => el.textContent = cvarValue);
         document.getElementById('lossProbBadge').textContent = "Loss Probability: " + (params.lossProb * 100).toFixed(1) + "%";
+
+const wrapper = document.getElementById('chartWrapper');
+        wrapper.style.opacity = '0';
+        wrapper.style.transition = 'opacity 0.3s';
+        setTimeout(() => { wrapper.style.opacity = '1'; }, 50);
 
         // 7. 绘制图表（基于真实波动率模拟路径）
         const numDays = Math.min(settlementPeriod, 90);
@@ -365,8 +386,9 @@
         });
         const currentLine = labels.map(() => baseVal);
 
-        const ctx = document.getElementById('predictionChart').getContext('2d');
-        new Chart(ctx, {
+        if (predictionChartInstance) predictionChartInstance.destroy();
+const ctx = document.getElementById('predictionChart').getContext('2d');
+predictionChartInstance = new Chart(ctx, {
             type: 'line',
             data: {
                 labels,
@@ -387,17 +409,21 @@
                 scales: {
                     x: { grid: { borderDash: [3, 3], color: '#e5e7eb' } },
                     y: {
-                        title: { display: true, text: 'Market Value (' + preferredCurrency + ')', color: '#0a2463', font: { weight: 'bold' } },
+                        title: { display: true, text: 'Market Value (' + currency + ')', color: '#0a2463', font: { weight: 'bold' } },
                         grid: { borderDash: [3, 3], color: '#e5e7eb' }
                     }
                 }
             }
-        });
+      }); // Chart结束
 
-        // 8. 跳转
+        } // renderReport函数结束
+
+         // 初始渲染
+        renderReport(preferredCurrency);
         document.getElementById('strategyBtn').addEventListener('click', function () {
             window.location.href = 'strategy.html';
         });
+
     </script>
 <script src="./tier-manager.js"></script>
 
@@ -468,7 +494,93 @@
             });
         }
     });
+
+// ==========================================
+        // 以下是新增的切换货币与权限锁定逻辑
+        // ==========================================
+        
+        // 1. 找到刚刚加了 ID 的主报告容器
+        const reportContent = document.getElementById('reportContent');
+
+        // 2. 自动克隆出 THB 和 SGD 的隐藏占位容器 (保留你原有的排版)
+        const reportTHB = reportContent.cloneNode(true);
+        reportTHB.id = 'reportTHB';
+        reportTHB.classList.add('hidden');
+        reportTHB.querySelectorAll('[id]').forEach(el => el.removeAttribute('id'));
+        reportContent.parentNode.insertBefore(reportTHB, reportContent.nextSibling);
+
+        const reportSGD = reportContent.cloneNode(true);
+        reportSGD.id = 'reportSGD';
+        reportSGD.classList.add('hidden');
+        reportSGD.querySelectorAll('[id]').forEach(el => el.removeAttribute('id'));
+        reportContent.parentNode.insertBefore(reportSGD, reportTHB.nextSibling);
+
+        // 3. 获取当前用户的档位
+       
+
+        // 隐藏 Pro 用户的锁图标
+        if (currentTier === 'pro') {
+            document.getElementById('lock-THB').style.display = 'none';
+            document.getElementById('lock-SGD').style.display = 'none';
+        }
+
+        // 4. 为 Free 和 Basic 用户锁定 THB/SGD
+        if (currentTier === 'free' || currentTier === 'basic') {
+            setTimeout(() => {
+                // 确保 tier-manager.js 已经加载了 applyFrostedLock 函数
+                if (typeof applyFrostedLock === 'function') {
+                    applyFrostedLock('reportSGD', 'Pro Feature', 'Upgrade to ¥368/mo to unlock SGD risk analysis');
+                    applyFrostedLock('reportTHB', 'Pro Feature', 'Upgrade to ¥368/mo to unlock THB risk analysis');
+                }
+            }, 200);
+        }
+
+        // 5. 定义点击 Tab 切换货币的逻辑
+        window.switchCurrency = function(currency) {
+            // 切换 Tab 的高亮样式
+            ['MYR', 'THB', 'SGD'].forEach(c => {
+                const tab = document.getElementById(`tab-${c}`);
+                if (!tab) return;
+                if (c === currency) {
+                    tab.classList.remove('text-gray-400', 'border-transparent', 'hover:text-[#0a2463]');
+                    tab.classList.add('text-[#0a2463]', 'border-[#0a2463]');
+                } else {
+                    tab.classList.add('text-gray-400', 'border-transparent', 'hover:text-[#0a2463]');
+                    tab.classList.remove('text-[#0a2463]', 'border-[#0a2463]');
+                }
+            });
+
+            // 先隐藏所有报告内容
+            reportContent.classList.add('hidden');
+            reportTHB.classList.add('hidden');
+            reportSGD.classList.add('hidden');
+
+            // 根据货币和权限，显示对应的容器
+            if (currency === 'MYR') {
+                reportContent.classList.remove('hidden');
+renderReport(currency);
+                
+            } else if (currency === 'THB') {
+                if (currentTier === 'pro') {
+                    reportContent.classList.remove('hidden'); // Pro用户能正常看到内容
+renderReport(currency);
+                } else {
+                    reportTHB.classList.remove('hidden');    // 基础用户看带锁的马赛克
+                }
+                
+            } else if (currency === 'SGD') {
+                if (currentTier === 'pro') {
+                    reportContent.classList.remove('hidden'); // Pro用户能正常看到内容
+renderReport(currency);
+                } else {
+                    reportSGD.classList.remove('hidden');    // 基础用户看带锁的马赛克
+                }
+            }
+        };
+
 </script>
+
+
 
 </body>
 </html>

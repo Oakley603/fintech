@@ -91,12 +91,12 @@
         </div>
 
         <!-- 第二排：实时汇率图表区 -->
-        <div class="bg-white border-2 border-gray-200 p-8 mb-8 rounded-sm">
-            <div class="flex items-center justify-between mb-6">
+       <div class="bg-white border-2 border-gray-200 p-8 mb-8 rounded-sm">
+            <div class="flex flex-col md:flex-row md:items-center justify-between mb-6 gap-4">
                 <div>
                     <div class="flex items-center gap-3 mb-2">
-                        <h3 class="text-2xl font-bold text-[#0a2463]">
-                            Live Exchange Rate: CNY/<span class="currency-label">MYR</span>
+                        <h3 id="liveChartTitle" class="text-2xl font-bold text-[#0a2463]">
+                            Live Exchange Rate: CNY/MYR
                         </h3>
                         <span class="bg-red-600 text-white text-xs font-bold px-2 py-1 rounded flex items-center animate-pulse">
                             <span class="w-2 h-2 bg-white rounded-full mr-2"></span>LIVE
@@ -108,6 +108,12 @@
                         <span class="text-gray-500">Last 30 days</span>
                     </div>
                 </div>
+
+                <div class="flex bg-gray-100 p-1 rounded-lg self-start">
+                    <button class="live-tab-btn px-4 py-2 text-sm font-bold rounded-md bg-white text-[#0a2463] shadow-sm transition-all" data-currency="MYR" data-baserate="0.6482">CNY/MYR</button>
+                    <button class="live-tab-btn px-4 py-2 text-sm font-bold rounded-md text-gray-500 hover:text-gray-700 transition-all" data-currency="THB" data-baserate="4.4940">CNY/THB</button>
+                    <button class="live-tab-btn px-4 py-2 text-sm font-bold rounded-md text-gray-500 hover:text-gray-700 transition-all" data-currency="SGD" data-baserate="0.1852">CNY/SGD</button>
+                </div>
             </div>
 
             <div class="w-full h-[400px]">
@@ -116,7 +122,7 @@
 
             <div class="mt-4 p-4 bg-blue-50 border border-blue-200 rounded-sm">
                 <p class="text-sm text-gray-700">
-                    <strong>Market Insight:</strong> The <span class="currency-label">MYR</span> has <span id="insightTrend">depreciated</span> against CNY by <span id="insightPercent">--</span>% over the past 30 days. Consider hedging to protect against further volatility.
+                    <strong>Market Insight:</strong> The <span id="insightCurrency" class="font-bold">MYR</span> has <span id="insightTrend">depreciated</span> against CNY by <span id="insightPercent">--</span>% over the past 30 days. Consider hedging to protect against further volatility.
                 </p>
             </div>
         </div>
@@ -161,24 +167,24 @@
 <div id="alertChartPanel" class="bg-white p-6 rounded-lg shadow border border-gray-100 col-span-2 flex flex-col transition-all">
         <h3 class="text-xl font-bold text-[#0A2463] mb-5">Market Trends (30-Day % Change)</h3>
         
-        <div class="grid grid-cols-1 md:grid-cols-3 gap-4 mb-6">
+       <div class="grid grid-cols-1 md:grid-cols-3 gap-4 mb-6">
             <div id="rateCardMYR" class="bg-blue-50/50 border border-blue-100 p-4 rounded-lg shadow-sm">
                 <div class="text-sm text-gray-500 font-bold mb-1">CNY / MYR</div>
-                <div class="text-2xl font-extrabold text-[#0a2463] mb-1">1.7250</div>
+                <div class="text-2xl font-extrabold text-[#0a2463] mb-1">0.5774</div>
                 <div class="flex items-center text-sm font-bold text-[#E24B4A]">
                     <i data-lucide="trending-down" class="w-4 h-4 mr-1"></i> -2.4%
                 </div>
             </div>
             <div id="rateCardSGD" class="bg-white border border-gray-200 p-4 rounded-lg shadow-sm">
                 <div class="text-sm text-gray-500 font-bold mb-1">CNY / SGD</div>
-                <div class="text-2xl font-extrabold text-gray-800 mb-1">5.3420</div>
+                <div class="text-2xl font-extrabold text-gray-800 mb-1">0.1852</div>
                 <div class="flex items-center text-sm font-bold text-[#1D9E75]">
                     <i data-lucide="trending-up" class="w-4 h-4 mr-1"></i> +1.8%
                 </div>
             </div>
             <div id="rateCardTHB" class="bg-white border border-gray-200 p-4 rounded-lg shadow-sm">
                 <div class="text-sm text-gray-500 font-bold mb-1">CNY / THB</div>
-                <div class="text-2xl font-extrabold text-gray-800 mb-1">4.9810</div>
+                <div class="text-2xl font-extrabold text-gray-800 mb-1">5.050</div>
                 <div class="flex items-center text-sm font-bold text-[#1D9E75]">
                     <i data-lucide="trending-up" class="w-4 h-4 mr-1"></i> +0.9%
                 </div>
@@ -271,83 +277,131 @@
             el.textContent = preferredCurrency;
         });
 
-        // 2. 模拟过去 30 天的汇率数据（固定种子，避免每次刷新都变）
-        const generateMockData = () => {
+        // 2 & 3. 动态多货币汇率图表逻辑
+        let mainExchangeChart = null; // 用于存储 Chart 实例以便重绘
+
+        // 生成模拟数据：基于基础汇率等比例缩放波动幅度
+        const generateLiveMockData = (baseRate) => {
             const labels = [];
             const data = [];
-            const baseRate = 0.6482; // CNY/MYR 基础汇率（固定）
-            // 使用固定的偏移数组，保证每次刷新数据一致
-            const offsets = [0,-0.002,0.003,-0.001,0.004,-0.003,0.001,0.005,-0.002,0.002,
+            // 基于原始 MYR 设计的固定波动 offset 数组
+            const baseOffsets = [0,-0.002,0.003,-0.001,0.004,-0.003,0.001,0.005,-0.002,0.002,
                             -0.004,0.003,0.001,-0.001,0.002,-0.003,0.004,-0.002,0.001,0.003,
                             -0.001,-0.002,0.004,0.002,-0.003,0.001,-0.001,0.003,0.002,-0.001,0.002];
+
+            // 核心逻辑：THB 汇率基数大，波动数值也需要等比例放大；SGD 汇率基数小，波动数值等比例缩小
+            const scale = baseRate / 0.6482;
 
             for (let i = 30; i >= 0; i--) {
                 const date = new Date();
                 date.setDate(date.getDate() - i);
                 const dateString = date.toLocaleDateString('en-US', { month: 'short', day: 'numeric' });
-                const rate = Number((baseRate + offsets[30 - i]).toFixed(4));
+                
+                const offset = baseOffsets[30 - i] * scale;
+                const rate = Number((baseRate + offset).toFixed(4));
                 labels.push(dateString);
                 data.push(rate);
             }
             return { labels, data };
         };
 
-        const chartData = generateMockData();
-        const currentRate = chartData.data[chartData.data.length - 1];
-        const firstRate = chartData.data[0];
-        const rateChange = (((currentRate - firstRate) / firstRate) * 100).toFixed(2);
+        // 更新图表及页面文本的统筹函数
+        const updateLiveChart = (currency, baseRate) => {
+            const chartData = generateLiveMockData(baseRate);
+            const currentRate = chartData.data[chartData.data.length - 1];
+            const firstRate = chartData.data[0];
+            const rateChange = (((currentRate - firstRate) / firstRate) * 100).toFixed(2);
 
-        document.getElementById('currentRateDisplay').textContent = currentRate;
-        const rateChangeEl = document.getElementById('rateChangeDisplay');
-        rateChangeEl.textContent = (rateChange >= 0 ? '+' : '') + rateChange + '%';
-        rateChangeEl.className = rateChange >= 0 ? "text-xl font-semibold text-green-600" : "text-xl font-semibold text-red-600";
-        document.getElementById('insightTrend').textContent = rateChange >= 0 ? 'appreciated' : 'depreciated';
-        document.getElementById('insightPercent').textContent = Math.abs(rateChange);
+            // 更新 DOM 上的标题和实时数值
+            document.getElementById('liveChartTitle').textContent = `Live Exchange Rate: CNY/${currency}`;
+            document.getElementById('currentRateDisplay').textContent = currentRate.toFixed(4);
+            
+            // 更新涨跌幅与颜色
+            const rateChangeEl = document.getElementById('rateChangeDisplay');
+            rateChangeEl.textContent = (rateChange >= 0 ? '+' : '') + rateChange + '%';
+            rateChangeEl.className = rateChange >= 0 ? "text-xl font-semibold text-green-600" : "text-xl font-semibold text-red-600";
+            
+            // 更新底部洞察文案
+            document.getElementById('insightCurrency').textContent = currency;
+            document.getElementById('insightTrend').textContent = rateChange >= 0 ? 'appreciated' : 'depreciated';
+            document.getElementById('insightPercent').textContent = Math.abs(rateChange);
 
-        // 3. 使用 Chart.js 绘制折线图
-        const ctx = document.getElementById('exchangeRateChart').getContext('2d');
-        new Chart(ctx, {
-            type: 'line',
-            data: {
-                labels: chartData.labels,
-                datasets: [{
-                    label: `CNY/${preferredCurrency}`,
-                    data: chartData.data,
-                    borderColor: '#0a2463',
-                    borderWidth: 3,
-                    pointRadius: 0,
-                    pointHoverRadius: 6,
-                    fill: false,
-                    tension: 0.1
-                }]
-            },
-            options: {
-                responsive: true,
-                maintainAspectRatio: false,
-                plugins: {
-                    legend: { display: false },
-                    tooltip: {
-                        backgroundColor: '#fff',
-                        titleColor: '#000',
-                        bodyColor: '#0a2463',
-                        borderColor: '#0a2463',
-                        borderWidth: 2,
-                        padding: 10,
-                        displayColors: false
-                    }
-                },
-                scales: {
-                    x: {
-                        grid: { borderDash: [3, 3], color: '#e5e7eb' },
-                        ticks: { color: '#6b7280', maxTicksLimit: 10 }
+            // 使用 Chart.js 更新或创建折线图
+            const ctx = document.getElementById('exchangeRateChart').getContext('2d');
+            
+            if (mainExchangeChart) {
+                // 如果图表已存在，只更新数据并重绘，性能更好且带过渡动画
+                mainExchangeChart.data.labels = chartData.labels;
+                mainExchangeChart.data.datasets[0].data = chartData.data;
+                mainExchangeChart.data.datasets[0].label = `CNY/${currency}`;
+                mainExchangeChart.update();
+            } else {
+                // 初次初始化图表
+                mainExchangeChart = new Chart(ctx, {
+                    type: 'line',
+                    data: {
+                        labels: chartData.labels,
+                        datasets: [{
+                            label: `CNY/${currency}`,
+                            data: chartData.data,
+                            borderColor: '#0a2463',
+                            borderWidth: 3,
+                            pointRadius: 0,
+                            pointHoverRadius: 6,
+                            fill: false,
+                            tension: 0.1
+                        }]
                     },
-                    y: {
-                        grid: { borderDash: [3, 3], color: '#e5e7eb' },
-                        ticks: { color: '#6b7280' }
+                    options: {
+                        responsive: true,
+                        maintainAspectRatio: false,
+                        plugins: {
+                            legend: { display: false },
+                            tooltip: {
+                                backgroundColor: '#fff',
+                                titleColor: '#000',
+                                bodyColor: '#0a2463',
+                                borderColor: '#0a2463',
+                                borderWidth: 2,
+                                padding: 10,
+                                displayColors: false
+                            }
+                        },
+                        scales: {
+                            x: {
+                                grid: { borderDash: [3, 3], color: '#e5e7eb' },
+                                ticks: { color: '#6b7280', maxTicksLimit: 10 }
+                            },
+                            y: {
+                                grid: { borderDash: [3, 3], color: '#e5e7eb' },
+                                ticks: { color: '#6b7280' }
+                            }
+                        }
                     }
-                }
+                });
             }
+        };
+
+        // 绑定 Tab 按钮点击事件
+        document.querySelectorAll('.live-tab-btn').forEach(btn => {
+            btn.addEventListener('click', (e) => {
+                // 1. 重置所有按钮状态为未选中
+                document.querySelectorAll('.live-tab-btn').forEach(b => {
+                    b.className = 'live-tab-btn px-4 py-2 text-sm font-bold rounded-md text-gray-500 hover:text-gray-700 transition-all';
+                });
+                
+                // 2. 为当前点击的按钮添加激活态样式
+                e.currentTarget.className = 'live-tab-btn px-4 py-2 text-sm font-bold rounded-md bg-white text-[#0a2463] shadow-sm transition-all';
+                
+                // 3. 读取数据属性并触发图表更新
+                const currency = e.currentTarget.getAttribute('data-currency');
+                const baseRate = parseFloat(e.currentTarget.getAttribute('data-baserate'));
+                updateLiveChart(currency, baseRate);
+            });
         });
+
+        // 页面加载完成后，默认渲染 MYR 选项卡的数据
+        updateLiveChart('MYR', 0.6482);
 
         // 4. 页面跳转
         document.getElementById('logoutBtn').addEventListener('click', function() {
