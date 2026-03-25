@@ -160,7 +160,7 @@
 </div>
 <div id="multiCurrencyRecommendations" class="hidden flex flex-col items-stretch w-full max-w-4xl mx-auto mb-8 mt-4 transition-all gap-6">
             
-<div class="w-full bg-[#FFF5F5] border-2 border-red-200 rounded-lg p-6 relative shadow-sm hover:shadow-md transition-shadow flex flex-col justify-between h-full">
+<div class="w-full bg-[#FFF5F5] border-2 border-red-200 rounded-lg p-6 relative shadow-sm hover:shadow-md transition-shadow flex flex-col justify-between h-full" data-currency="MYR">
                 <div class="flex justify-between items-start mb-4 border-b border-red-100 pb-3">
                     <div class="text-xl font-extrabold text-gray-800 tracking-wide">CNY/MYR</div>
                     <div class="bg-[#E24B4A] text-white text-xs font-bold px-3 py-1 rounded-full uppercase flex items-center gap-2 shadow-sm">
@@ -180,7 +180,7 @@
                 </div>
             </div>
 
-<div class="w-full bg-[#FFFBF0] border-2 border-yellow-200 rounded-lg p-6 relative shadow-sm hover:shadow-md transition-shadow flex flex-col justify-between h-full">
+<div class="w-full bg-[#FFFBF0] border-2 border-yellow-200 rounded-lg p-6 relative shadow-sm hover:shadow-md transition-shadow flex flex-col justify-between h-full" data-currency="THB">
                 <div class="flex justify-between items-start mb-4 border-b border-yellow-100 pb-3">
                     <div class="text-xl font-extrabold text-gray-800 tracking-wide">CNY/THB</div>
                     <div class="bg-yellow-500 text-white text-xs font-bold px-3 py-1 rounded-full uppercase shadow-sm">
@@ -202,7 +202,7 @@
           
 
 
-            <div class="w-full bg-[#F0FFF8] border-2 border-green-200 rounded-lg p-6 relative shadow-sm hover:shadow-md transition-shadow flex flex-col justify-between h-full">
+            <div class="w-full bg-[#F0FFF8] border-2 border-green-200 rounded-lg p-6 relative shadow-sm hover:shadow-md transition-shadow flex flex-col justify-between h-full" data-currency="SGD">
                 <div class="flex justify-between items-start mb-4 border-b border-green-100 pb-3">
                     <div class="text-xl font-extrabold text-gray-800 tracking-wide">CNY/SGD</div>
                     <div class="bg-[#1D9E75] text-white text-xs font-bold px-3 py-1 rounded-full uppercase shadow-sm">
@@ -393,11 +393,24 @@
     <script>
         lucide.createIcons();
 
-        // 获取本地存储数据
-        const unsettledAmount = parseFloat(localStorage.getItem("unsettledAmount")) || 100000;
-        const settlementPeriod = localStorage.getItem("settlementPeriod") || "30";
-        const riskTolerance = parseInt(localStorage.getItem("riskTolerance")) || 50;
-        const preferredCurrency = localStorage.getItem("preferredCurrency") || "MYR";
+        // 数据兜底：如果关键数据缺失，用演示数据填充
+        const unsettledAmount = parseFloat(localStorage.getItem('unsettledAmount')) || 100000;
+        const settlementPeriod = parseInt(localStorage.getItem('settlementPeriod')) || 30;
+        const preferredCurrency = localStorage.getItem('preferredCurrency') || 'MYR';
+        const selectedCurrencies = JSON.parse(localStorage.getItem('selectedCurrencies')) || ['MYR'];
+        const riskTolerance = parseInt(localStorage.getItem('riskTolerance')) || 50;
+
+        // 如果是直接跳转（无数据），在页面最顶部插入一条黄色的提示横幅
+        if (!localStorage.getItem('unsettledAmount')) {
+            const bar = document.createElement('div');
+            // 使用 Tailwind CSS 给提示条加样式，确保它醒目且在最上层
+            bar.className = 'bg-yellow-50 border-b border-yellow-200 px-4 py-2 text-sm text-yellow-800 flex items-center justify-center gap-2 relative z-50';
+            bar.innerHTML = '<i data-lucide="info" class="w-4 h-4"></i> Showing sample data. <a href="./data-input.html" class="font-bold underline ml-1">Enter your own data →</a>';
+            // 将提示条插入到 body 的最前面
+            document.body.insertBefore(bar, document.body.firstChild);
+            // 重新渲染刚刚插入的 info 图标
+            lucide.createIcons();
+        }
         
 // 动态对冲方案配置
 
@@ -567,6 +580,14 @@ const singleViewBtn = document.getElementById('singleViewBtn');
         const singleCurrencyRecommendations = document.getElementById('singleCurrencyRecommendations');
         const multiCurrencyRecommendations = document.getElementById('multiCurrencyRecommendations');
 
+// 如果只有一个货币 → 强制单货币模式
+if (selectedCurrencies.length === 1) {
+    if (multiViewBtn) multiViewBtn.style.display = 'none';
+    if (multiCurrencyBanner) multiCurrencyBanner.classList.add('hidden');
+    if (multiCurrencyRecommendations) multiCurrencyRecommendations.classList.add('hidden');
+    if (singleCurrencyRecommendations) singleCurrencyRecommendations.classList.remove('hidden');
+}
+
         if (singleViewBtn && multiViewBtn) {
             // 点击单货币视图
             singleViewBtn.addEventListener('click', () => {
@@ -626,9 +647,21 @@ const singleViewBtn = document.getElementById('singleViewBtn');
             const elTotalRemaining = document.getElementById('multiTotalRemaining'); // 获取剩余敞口的元素
 
             // 4. 把算出来的数字格式化并显示出来
-            if(elMYR) elMYR.textContent = '¥' + returnMYR.toLocaleString('en-US');
-            if(elTHB) elTHB.textContent = '¥' + returnTHB.toLocaleString('en-US');
-            if(elSGD) elSGD.textContent = '¥' + returnSGD.toLocaleString('en-US');
+           if(elMYR && selectedCurrencies.includes('MYR')) 
+  elMYR.textContent = '¥' + returnMYR.toLocaleString('en-US');
+else if(elMYR) 
+  elMYR.closest('[data-currency="MYR"]') && 
+  (elMYR.textContent = '-');
+
+if(elTHB && selectedCurrencies.includes('THB')) 
+  elTHB.textContent = '¥' + returnTHB.toLocaleString('en-US');
+else if(elTHB) 
+  elTHB.textContent = '-';
+
+if(elSGD && selectedCurrencies.includes('SGD')) 
+  elSGD.textContent = '¥' + returnSGD.toLocaleString('en-US');
+else if(elSGD) 
+  elSGD.textContent = '-';
             if(elTotalReturn) elTotalReturn.textContent = '¥' + totalReturn.toLocaleString('en-US');
             
             // 更新总剩余敞口显示
@@ -636,6 +669,24 @@ const singleViewBtn = document.getElementById('singleViewBtn');
         }
 // 页面加载时执行一次计算
 updateMultiCurrencyReturns();
+filterMultiCurrencyCards();
+function filterMultiCurrencyCards() {
+    const cards = document.querySelectorAll('#multiCurrencyRecommendations > div');
+
+    cards.forEach(card => {
+        const currency = card.getAttribute('data-currency');
+
+        // 只对有 data-currency 的卡片做过滤（避免影响 summary 区块）
+        if (currency) {
+            if (!selectedCurrencies.includes(currency)) {
+                card.style.display = 'none';
+            } else {
+                card.style.display = 'flex';
+            }
+        }
+    });
+}
+filterMultiCurrencyCards();
 // ====================================================
 
 // ================== 新增：第三方执行确认弹窗逻辑 ==================
@@ -718,9 +769,53 @@ updateMultiCurrencyReturns();
                 currentTargetUrl = '';
             });
         }
-        // ===============================================================
+       // ===============================================================
 
     </script>
+
 <script src="./tier-manager.js"></script>
+
+<script>
+    if ((localStorage.getItem('fx_userTier') || 'free') === 'free') {
+        // 1. 禁止底层页面滚动，防止用户通过滑动偷看下面未显示的内容
+        document.body.style.overflow = 'hidden';
+
+        // 2. 创建一个盖在最上面的遮罩层 (div)
+        const overlay = document.createElement('div');
+        
+        // 使用 Tailwind 的 backdrop-blur-md (中度模糊) 和 bg-white/40 (40%透明度的白色) 营造毛玻璃效果
+        // z-[9999] 确保这个遮罩层在页面的最最最上层
+        overlay.className = "fixed inset-0 z-[9999] backdrop-blur-md bg-white/40 flex flex-col items-center justify-center px-4";
+
+        // 3. 在遮罩层中心放一个纯白的卡片，用来装文字和按钮，保证文字清晰易读
+        overlay.innerHTML = `
+          <div class="bg-white p-8 rounded-2xl shadow-2xl flex flex-col items-center gap-5 max-w-sm w-full border border-gray-100">
+            <div class="w-16 h-16 bg-blue-50 rounded-full flex items-center justify-center">
+              <i data-lucide="lock" class="w-8 h-8 text-[#0a2463]"></i>
+            </div>
+            <h2 class="text-2xl font-bold text-[#0a2463] text-center">
+              Strategy is a Basic feature
+            </h2>
+            <p class="text-gray-500 text-center text-sm px-2">
+              Upgrade to Basic (¥198/mo) to unlock hedging strategy recommendations.
+            </p>
+            <div class="flex flex-col gap-3 w-full mt-4">
+              <button onclick="alert('Redirecting to pricing...')" class="w-full bg-[#0a2463] text-white font-bold py-3 px-6 rounded-xl hover:bg-blue-900 transition-colors">
+                Upgrade Now
+              </button>
+              <button onclick="history.back()" class="w-full border-2 border-[#0a2463] text-[#0a2463] font-bold py-3 px-6 rounded-xl hover:bg-gray-50 transition-colors">
+                Go Back
+              </button>
+            </div>
+          </div>
+        `;
+
+        // 4. 把这个写好的遮罩层，直接盖在现有的页面内容上面
+        document.body.appendChild(overlay);
+
+        // 5. 渲染锁形图标
+        lucide.createIcons();
+    }
+</script>
 </body>
 </html>

@@ -21,6 +21,12 @@ function initTierUI() {
             <option value="basic" ${currentTier === 'basic' ? 'selected' : ''}>Basic (¥198/mo)</option>
             <option value="pro" ${currentTier === 'pro' ? 'selected' : ''}>Pro (¥368/mo)</option>
         </select>
+<div style="margin-top: 10px; padding-top: 10px; border-top: 1px solid #ccc;">
+            <label style="font-size: 13px; cursor: pointer; display: flex; align-items: center; gap: 5px;">
+                <input type="checkbox" id="simAnnualMode"> 
+                Annual Billing (年付模式)
+            </label>
+        </div>
     `;
     document.body.appendChild(panel);
 
@@ -88,6 +94,7 @@ function applyTierRestrictions() {
         });
     }
 
+
 // E. Data Input 页面：SGD / THB 货币对锁定
     if (currentTier === 'free' || currentTier === 'basic') {
         const checkSGD = document.getElementById('checkSGD');
@@ -105,7 +112,17 @@ function applyTierRestrictions() {
             document.getElementById('textTHB').innerText += ' (Pro Only)';
         }
     }
-
+// F. 导航栏：多账号管理入口 (仅 Pro 可见)
+    const multiAccountEntry = document.getElementById('multiAccountEntry');
+    if (multiAccountEntry) {
+        if (currentTier === 'pro') {
+            multiAccountEntry.classList.remove('hidden');
+            multiAccountEntry.classList.add('block');
+        } else {
+            multiAccountEntry.classList.add('hidden');
+            multiAccountEntry.classList.remove('block');
+        }
+    }
     // D. Dashboard 页面：多货币卡片与图表标签锁定 (仅 Pro 可见)
     if (currentTier === 'free' || currentTier === 'basic') {
         applyFrostedLock('rateCardSGD', 'Pro Feature', 'Unlock SGD Tracker');
@@ -135,4 +152,33 @@ function applyTierRestrictions() {
 document.addEventListener('DOMContentLoaded', () => {
     initTierUI();
     setTimeout(applyTierRestrictions, 100);
+
+
+// 绑定：切换年付事件 (无刷新丝滑版)
+    const annualCheckbox = document.getElementById('simAnnualMode');
+    if (annualCheckbox) {
+        annualCheckbox.checked = localStorage.getItem('fx_isAnnual') === 'true';
+        annualCheckbox.addEventListener('change', (e) => {
+            localStorage.setItem('fx_isAnnual', e.target.checked);
+            // 如果 dashboard 页面有我们刚才写的更新函数，就直接调用它
+            if (typeof window.updateAnnualReportUI === 'function') {
+                window.updateAnnualReportUI();
+            } else {
+                // 备用方案
+                window.location.href = window.location.href; 
+            }
+        });
+    }
+setTimeout(() => {
+        const annualCheckbox = document.getElementById('simAnnualMode');
+        if (annualCheckbox) {
+            annualCheckbox.checked = localStorage.getItem('fx_isAnnual') === 'true';
+            annualCheckbox.addEventListener('change', (e) => {
+                localStorage.setItem('fx_isAnnual', e.target.checked);
+                if (typeof window.updateAnnualReportUI === 'function') {
+                    window.updateAnnualReportUI();
+                }
+            });
+        }
+    }, 150); // 比 initTierUI 晚一点，确保 checkbox 已经被创建
 });

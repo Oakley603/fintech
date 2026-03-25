@@ -106,6 +106,22 @@
                 <p class="text-gray-600">Sign in to manage your exchange rate risk</p>
             </div>
 
+<div class="bg-blue-50 border-2 border-[#0a2463] rounded-lg p-5 mb-6 text-center">
+  <p class="text-sm text-gray-500 mb-1">Want to explore first?</p>
+  <h3 class="text-lg font-bold text-[#0a2463] mb-3">Try the interactive demo</h3>
+  <button id="demoBtn" type="button" class="w-full bg-[#0a2463] hover:bg-blue-900 text-white font-bold py-3 px-6 rounded-lg transition-colors flex items-center justify-center gap-2 text-base">
+    <i data-lucide="play-circle" class="w-5 h-5"></i>
+    Enter Demo — No Sign Up
+  </button>
+  <p class="text-xs text-gray-400 mt-2">Pre-loaded with sample data · Basic tier access</p>
+</div>
+
+<div class="flex items-center gap-3 mb-6">
+  <div class="flex-1 h-px bg-gray-200"></div>
+  <span class="text-sm text-gray-400">or sign in with your account</span>
+  <div class="flex-1 h-px bg-gray-200"></div>
+</div>
+
             <form id="loginForm" class="space-y-6">
                 <!-- 账号输入 -->
                 <div class="space-y-2">
@@ -200,6 +216,18 @@
         document.getElementById('freeTrialBtn').addEventListener('click', function() {
             window.location.href = './register.html';
         });
+document.getElementById('demoBtn').addEventListener('click', () => {
+    // 设置演示用的预置数据
+    localStorage.setItem('fx_userTier', 'basic');
+    localStorage.setItem('fx_isDemo', 'true');
+    localStorage.setItem('unsettledAmount', '100000');
+    localStorage.setItem('settlementPeriod', '30');
+    localStorage.setItem('preferredCurrency', 'MYR');
+    localStorage.setItem('selectedCurrencies', JSON.stringify(['MYR']));
+    localStorage.setItem('riskTolerance', '40');
+    window.location.href = './dashboard.html';
+});
+
     </script>
 </body>
 </html>

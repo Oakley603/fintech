@@ -183,7 +183,7 @@
                 </li>
                 <li class="flex items-start gap-2">
                     <span class="text-[#0a2463] font-bold mt-1">•</span>
-                    <span>Our GJR-GARCH model (alpha+beta=0.9895) shows <strong>high volatility persistence</strong> — adverse rate movements tend to last. Hedging is strongly recommended.</span>
+                    <span>Our GJR-GARCH model (alpha+beta=<span id="alphaBetaDisplay">0.9895</span>) shows <strong>high volatility persistence</strong> — adverse rate movements tend to last. Hedging is strongly recommended.</span>
                 </li>
             </ul>
         </div>
@@ -199,10 +199,14 @@
                     <span class="font-bold text-gray-900">Settle 70% Now:</span> 
                     Estimated <span class="font-bold text-[#1D9E75]">¥70,000</span> secured, locking in guaranteed returns.
                 </li>
-                <li>
-                    <span class="font-bold text-gray-900">Hold 30% Exposure:</span> 
-                    If the rate reaches 1.76 within 14 days, potential extra gain of <span class="font-bold text-[#1D9E75]">~¥3,000</span>.
-                </li>
+               <li>
+    <span class="font-bold text-gray-900">Hold 30% Exposure:</span> 
+    If the rate reaches <span id="targetRateDisplay">1.76</span> within 14 days, potential extra gain of <span class="font-bold text-[#1D9E75]">~¥3,000</span>.
+</li>
+<li>
+    <span class="font-bold text-gray-900">Worst-case Scenario (80% prob.):</span> 
+    If the rate drops to <span id="floorRateDisplay">1.72</span>, potential extra loss of <span class="font-bold text-[#E24B4A]">~¥2,500</span>.
+</li>
                 <li>
                     <span class="font-bold text-gray-900">Worst-case Scenario (80% prob.):</span> 
                     If the rate drops to 1.72, potential extra loss of <span class="font-bold text-[#E24B4A]">~¥2,500</span>.
@@ -287,10 +291,33 @@
     <script>
         lucide.createIcons();
 
-        // 1. 读取 localStorage
-        const unsettledAmount = parseFloat(localStorage.getItem("unsettledAmount")) || 10000;
-        const settlementPeriod = parseInt(localStorage.getItem("settlementPeriod")) || 30;
-        const preferredCurrency = localStorage.getItem("preferredCurrency") || "MYR";
+
+        // 数据兜底：如果关键数据缺失，用演示数据填充
+        const unsettledAmount = parseFloat(localStorage.getItem('unsettledAmount')) || 100000;
+        const settlementPeriod = parseInt(localStorage.getItem('settlementPeriod')) || 30;
+        const preferredCurrency = localStorage.getItem('preferredCurrency') || 'MYR';
+        const selectedCurrencies = JSON.parse(localStorage.getItem('selectedCurrencies')) || ['MYR'];
+        const riskTolerance = parseInt(localStorage.getItem('riskTolerance')) || 50;
+
+        // 如果是直接跳转（无数据），显示提示条
+        if (!localStorage.getItem('unsettledAmount')) {
+          const bar = document.createElement('div');
+          bar.className = 
+            'bg-yellow-50 border-b border-yellow-200 ' +
+            'px-4 py-2 text-sm text-yellow-800 ' +
+            'flex items-center gap-2';
+          bar.innerHTML = 
+            '<i data-lucide="info" class="w-4 h-4"></i>' +
+            'Showing sample data. ' +
+            '<a href="./data-input.html" ' +
+            'class="font-bold underline ml-1">' +
+            'Enter your own data →</a>';
+          document.body.insertBefore(
+            bar, document.body.firstChild
+          );
+          lucide.createIcons(); // 渲染提示条里的info图标
+        }
+
         let predictionChartInstance = null; // 用于销毁旧图表
 
         function renderReport(currency) {
@@ -415,6 +442,31 @@ predictionChartInstance = new Chart(ctx, {
                 }
             }
       }); // Chart结束
+// 1. 动态更新 alpha+beta 参数
+      const alphaBetaMap = {
+          'MYR': '0.9895',
+          'SGD': '0.9812',
+          'THB': '0.9734'
+      };
+      const alphaBetaDisplay = document.getElementById('alphaBetaDisplay');
+      if (alphaBetaDisplay) {
+          alphaBetaDisplay.textContent = alphaBetaMap[currency] || '0.9895';
+      }
+
+      // 2. 动态更新推荐策略的 floor 和 target 汇率
+      const rateLimitsMap = {
+          'MYR': { floor: '1.72', target: '1.76' },
+          'SGD': { floor: '0.51', target: '0.53' },
+          'THB': { floor: '0.20', target: '0.21' }
+      };
+      const targetRateDisplay = document.getElementById('targetRateDisplay');
+      const floorRateDisplay = document.getElementById('floorRateDisplay');
+
+      if (targetRateDisplay && floorRateDisplay) {
+          const limits = rateLimitsMap[currency] || rateLimitsMap['MYR'];
+          targetRateDisplay.textContent = limits.target;
+          floorRateDisplay.textContent = limits.floor;
+      }
 
         } // renderReport函数结束
 
