@@ -24,7 +24,7 @@ function initTierUI() {
 <div style="margin-top: 10px; padding-top: 10px; border-top: 1px solid #ccc;">
             <label style="font-size: 13px; cursor: pointer; display: flex; align-items: center; gap: 5px;">
                 <input type="checkbox" id="simAnnualMode"> 
-                Annual Billing (年付模式)
+                Annual Billing
             </label>
         </div>
     `;
