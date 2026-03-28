@@ -186,7 +186,7 @@
             </div>
             <div>
                 <label class="block text-sm font-medium text-[#1D9E75] mb-1">Target Rate (Alert)</label>
-                <input type="number" value="1.78" step="0.01" class="w-full border-gray-300 rounded-md shadow-sm p-2 border focus:border-[#1D9E75] focus:ring focus:ring-green-200">
+                <input id="targetRateInput" type="number" value="1.78" step="0.01" class="w-full border-gray-300 rounded-md shadow-sm p-2 border focus:border-[#1D9E75] focus:ring focus:ring-green-200">
             </div>
             <div class="pt-2">
                 <button id="saveAlertBtn" class="w-full bg-[#0A2463] text-white font-bold py-2 rounded hover:bg-blue-900 transition-colors disabled:opacity-50 disabled:cursor-not-allowed">
@@ -713,6 +713,100 @@
     </script>
 
 <script src="./fx-alert.js"></script>
+
+<script>
+// ==========================================
+// 预警线功能：保存、限制、提示
+// ==========================================
+document.addEventListener('DOMContentLoaded', () => {
+    const saveAlertBtn = document.getElementById('saveAlertBtn');
+    const alertUsageText = document.getElementById('alertUsageText');
+    const alertWarningMsg = document.getElementById('alertWarningMsg');
+    const alertCurrency = document.getElementById('alertCurrency');
+    const floorRateInput = document.getElementById('floorRateInput');
+    const targetRateInput = document.getElementById('targetRateInput'); // ← 预先获取
+    
+    // 1. 从localStorage读取当前档位
+    const currentTier = localStorage.getItem('fx_userTier') || 'free';
+    
+    // 2. 定义每个档位的预警线上限
+    const alertLimits = {
+        'free': 0,      // Free用户不能设置预警线
+        'basic': 1,     // Basic用户最多1条
+        'pro': 5        // Pro用户最多5条
+    };
+    const maxAlerts = alertLimits[currentTier];
+    
+    // 3. 读取已保存的预警线列表
+    function getAlerts() {
+        try {
+            return JSON.parse(localStorage.getItem('fx_alerts')) || [];
+        } catch(e) {
+            return [];
+        }
+    }
+    
+    // 4. 更新"已使用/总数"显示
+    function updateUsageDisplay() {
+        const alerts = getAlerts();
+        const usedCount = alerts.length;
+        alertUsageText.textContent = `Alert Lines: ${usedCount} / ${maxAlerts} used`;
+        
+        // 如果达到上限，显示警告并禁用按钮
+        if (usedCount >= maxAlerts) {
+            alertWarningMsg.classList.remove('hidden');
+            saveAlertBtn.disabled = true;
+            saveAlertBtn.classList.add('opacity-50', 'cursor-not-allowed'); // ← 添加灰色样式
+            saveAlertBtn.textContent = 'Limit Reached';
+        } else {
+            alertWarningMsg.classList.add('hidden');
+            saveAlertBtn.disabled = false;
+            saveAlertBtn.classList.remove('opacity-50', 'cursor-not-allowed'); // ← 移除灰色样式
+            saveAlertBtn.textContent = 'Save Settings';
+        }
+    }
+    
+    // 5. 保存预警线
+    if (saveAlertBtn) {
+        saveAlertBtn.addEventListener('click', () => {
+            const alerts = getAlerts();
+            
+            // 检查是否达到上限
+            if (alerts.length >= maxAlerts) {
+                alert(`You've reached the ${currentTier === 'basic' ? 'Basic' : 'Pro'} tier limit of ${maxAlerts} alert${maxAlerts > 1 ? 's' : ''}. Please upgrade or remove an existing alert.`);
+                return;
+            }
+            
+            // 获取当前设置的值
+            const currency = alertCurrency.value;
+            const floorRate = parseFloat(floorRateInput.value);
+            const targetRate = parseFloat(targetRateInput.value); // ← 现在不会报错了
+            
+            // 检查是否已存在相同货币对的预警线
+            const existingIndex = alerts.findIndex(a => a.currency === currency);
+            
+            if (existingIndex >= 0) {
+                // 更新已有的预警线
+                alerts[existingIndex] = { currency, floorRate, targetRate, createdAt: Date.now() };
+                alert('Alert updated successfully!');
+            } else {
+                // 添加新预警线
+                alerts.push({ currency, floorRate, targetRate, createdAt: Date.now() });
+                alert('Alert saved successfully!');
+            }
+            
+            // 保存到localStorage
+            localStorage.setItem('fx_alerts', JSON.stringify(alerts));
+            
+            // 更新显示
+            updateUsageDisplay();
+        });
+    }
+    
+    // 6. 页面加载时初始化显示
+    updateUsageDisplay();
+});
+</script>
 
 
 <script>
