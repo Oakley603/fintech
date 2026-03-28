@@ -62,10 +62,7 @@
 <div id="reportContent">
 
 <div class="flex gap-4 mb-8 border-b-2 border-gray-100 pb-2" id="currencyTabs">
-            <button onclick="switchCurrency('MYR')" id="tab-MYR" class="px-6 py-2 font-bold text-[#0a2463] border-b-4 border-[#0a2463] transition-colors focus:outline-none">CNY / MYR</button>
-            <button onclick="switchCurrency('THB')" id="tab-THB" class="px-6 py-2 font-bold text-gray-400 border-b-4 border-transparent hover:text-[#0a2463] transition-colors focus:outline-none">CNY / THB <span id="lock-THB" class="text-xs">🔒</span></button>
-<button onclick="switchCurrency('SGD')" id="tab-SGD" class="px-6 py-2 font-bold text-gray-400 border-b-4 border-transparent hover:text-[#0a2463] transition-colors focus:outline-none">CNY / SGD <span id="lock-SGD" class="text-xs">🔒</span></button>
-        </div>
+                    </div>
 
         <!-- 当前风险敞口 -->
         <div class="bg-[#0a2463] text-white p-8 mb-8 rounded-sm shadow-md">
@@ -289,14 +286,45 @@
     </div>
 
     <script>
+document.addEventListener('DOMContentLoaded', () => {
+        const selectedCurrencies = JSON.parse(localStorage.getItem("selectedCurrencies")) || ['MYR'];
+        const currentTier = localStorage.getItem('fx_userTier') || 'free';
+        
+        const tabContainer = document.getElementById('currencyTabs');
+        if (tabContainer) {
+            tabContainer.innerHTML = '';
+            
+            selectedCurrencies.forEach((currency, index) => {
+                const isLocked = (currentTier === 'free' || currentTier === 'basic') && currency !== 'MYR';
+                
+                const button = document.createElement('button');
+                button.id = `tab-${currency}`;
+                button.onclick = () => switchCurrency(currency);
+                button.className = index === 0 
+                    ? 'px-6 py-2 font-bold text-[#0a2463] border-b-4 border-[#0a2463] transition-colors focus:outline-none'
+                    : 'px-6 py-2 font-bold text-gray-400 border-b-4 border-transparent hover:text-[#0a2463] transition-colors focus:outline-none';
+                
+                button.innerHTML = `CNY / ${currency} ${isLocked ? '<span class="text-xs">🔒</span>' : ''}`;
+                
+                tabContainer.appendChild(button);
+            });
+            
+           if (selectedCurrencies.length > 0) {
+            setTimeout(() => {
+                if (typeof switchCurrency === 'function') {
+                    switchCurrency(selectedCurrencies[0]);
+                }
+            }, 500);
+        }
+    }
+});
+
         lucide.createIcons();
 
 
         // 数据兜底：如果关键数据缺失，用演示数据填充
-        const unsettledAmount = parseFloat(localStorage.getItem('unsettledAmount')) || 100000;
-        const settlementPeriod = parseInt(localStorage.getItem('settlementPeriod')) || 30;
+       
         const preferredCurrency = localStorage.getItem('preferredCurrency') || 'MYR';
-        const selectedCurrencies = JSON.parse(localStorage.getItem('selectedCurrencies')) || ['MYR'];
         const riskTolerance = parseInt(localStorage.getItem('riskTolerance')) || 50;
 
         // 如果是直接跳转（无数据），显示提示条
@@ -321,6 +349,22 @@
         let predictionChartInstance = null; // 用于销毁旧图表
 
         function renderReport(currency) {
+    // 1. 先读取所有货币对的输入数据
+    const currencyInputs = JSON.parse(localStorage.getItem("currencyInputs")) || [];
+    
+    // 2. 找到当前货币对应的数据
+    const currentCurrencyData = currencyInputs.find(item => item.currency === currency);
+    
+    // 3. 如果找到了，就用它的金额和周期；找不到就用默认值
+    let unsettledAmount, settlementPeriod;
+    if (currentCurrencyData) {
+        unsettledAmount = currentCurrencyData.amount;
+        settlementPeriod = currentCurrencyData.period;
+    } else {
+        // 兜底：如果没有数据，用演示数据
+        unsettledAmount = 100000;
+        settlementPeriod = 30;
+    }
 
         // 2. 真实汇率（来自数据集，CNY为基准：1 CNY = X 外币）
         const rateMap = {
@@ -567,14 +611,16 @@ predictionChartInstance = new Chart(ctx, {
         reportSGD.querySelectorAll('[id]').forEach(el => el.removeAttribute('id'));
         reportContent.parentNode.insertBefore(reportSGD, reportTHB.nextSibling);
 
-        // 3. 获取当前用户的档位
-       
+      // 3. 获取当前用户的档位
 
-        // 隐藏 Pro 用户的锁图标
-        if (currentTier === 'pro') {
-            document.getElementById('lock-THB').style.display = 'none';
-            document.getElementById('lock-SGD').style.display = 'none';
-        }
+// 隐藏 Pro 用户的锁图标
+if (currentTier === 'pro') {
+    const lockTHB = document.getElementById('lock-THB');
+    const lockSGD = document.getElementById('lock-SGD');
+    
+    if (lockTHB) lockTHB.style.display = 'none';
+    if (lockSGD) lockSGD.style.display = 'none';
+}
 
         // 4. 为 Free 和 Basic 用户锁定 THB/SGD
         if (currentTier === 'free' || currentTier === 'basic') {
@@ -589,6 +635,15 @@ predictionChartInstance = new Chart(ctx, {
 
         // 5. 定义点击 Tab 切换货币的逻辑
         window.switchCurrency = function(currency) {
+
+const currencyInputs = JSON.parse(localStorage.getItem("currencyInputs")) || [];
+    const currentCurrencyData = currencyInputs.find(item => item.currency === currency);
+    
+    if (!currentCurrencyData) {
+        alert(`No data found for ${currency}. Please go back to Data Input.`);
+        return;
+    }    
+
             // 切换 Tab 的高亮样式
             ['MYR', 'THB', 'SGD'].forEach(c => {
                 const tab = document.getElementById(`tab-${c}`);
@@ -629,6 +684,43 @@ renderReport(currency);
                 }
             }
         };
+
+function renderReportForCurrency(currency, amount, period) {
+    document.querySelectorAll('.currency-label').forEach(el => {
+        el.textContent = currency;
+    });
+    
+    const elem = document.getElementById('exposureAmount');
+    if (elem) elem.textContent = amount.toLocaleString();
+    
+    const localElem = document.getElementById('localAmount');
+    if (localElem) localElem.textContent = amount.toLocaleString();
+    
+    const chartTitle = document.getElementById('chartTitle');
+    if (chartTitle) chartTitle.textContent = period;
+    
+    const waitDays = document.getElementById('waitDays');
+    if (waitDays) waitDays.textContent = period;
+    
+    const mockRates = { MYR: 0.6482, THB: 4.4940, SGD: 0.1852 };
+    const currentRate = mockRates[currency] || 0.65;
+    const rateDisplay = document.getElementById('currentRateDisplay');
+    if (rateDisplay) rateDisplay.textContent = currentRate.toFixed(4);
+    
+    const guaranteedAmount = amount * currentRate;
+    const guaranteedElem = document.getElementById('guaranteedAmount');
+    if (guaranteedElem) guaranteedElem.textContent = guaranteedAmount.toFixed(2);
+    
+    const mockUpperBound = guaranteedAmount * 1.03;
+    const mockLowerBound = guaranteedAmount * 0.97;
+    
+    const gainElem = document.getElementById('potentialGain');
+    if (gainElem) gainElem.textContent = mockUpperBound.toFixed(2);
+    
+    const lossElem = document.getElementById('potentialLoss');
+    if (lossElem) lossElem.textContent = mockLowerBound.toFixed(2);
+}
+
 
 </script>
 
