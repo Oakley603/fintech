@@ -1,3 +1,4 @@
+
 <!DOCTYPE html>
 <html lang="en">
 
@@ -90,11 +91,11 @@
 
 <!-- 主体内容 -->
 <div class="container mx-auto px-4 sm:px-6 py-12 max-w-5xl">
-    <a href="risk-report.html"
-        class="flex items-center gap-2 text-[#0a2463] font-semibold mb-6 hover:underline inline-flex">
-        <i data-lucide="arrow-left" class="w-5 h-5"></i>
-        Back
-    </a>
+    <button id="backButton"
+    class="flex items-center gap-2 text-[#0a2463] font-semibold mb-6 hover:underline inline-flex cursor-pointer bg-transparent border-0">
+    <i data-lucide="arrow-left" class="w-5 h-5"></i>
+    Back
+</button>
 
     <!-- 进度指示器 -->
     <div class="flex items-center gap-4 mb-12">
@@ -661,26 +662,85 @@
         }
 
 
-        // 初始化
-        renderOptions();
-        updateDetails();
+       // 初始化
+renderOptions();
+updateDetails();
 
-        // 第三方按钮下拉逻辑
-        const executeBtn = document.getElementById('executeBtn');
-        const executeDropdown = document.getElementById('executeDropdown');
-        if (executeBtn && executeDropdown) {
-            executeBtn.addEventListener('click', () => {
-                executeDropdown.classList.toggle('hidden');
-                // 切换箭头图标方向
-                const icon = executeBtn.querySelector('i');
-                if (executeDropdown.classList.contains('hidden')) {
-                    icon.setAttribute('data-lucide', 'chevron-down');
-                } else {
-                    icon.setAttribute('data-lucide', 'chevron-up');
-                }
-                lucide.createIcons();
-            });
+// 第三方按钮下拉逻辑
+const executeBtn = document.getElementById('executeBtn');
+const executeDropdown = document.getElementById('executeDropdown');
+if (executeBtn && executeDropdown) {
+    executeBtn.addEventListener('click', () => {
+        executeDropdown.classList.toggle('hidden');
+        const icon = executeBtn.querySelector('i');
+        if (executeDropdown.classList.contains('hidden')) {
+            icon.setAttribute('data-lucide', 'chevron-down');
+        } else {
+            icon.setAttribute('data-lucide', 'chevron-up');
         }
+        lucide.createIcons();
+    });
+}
+
+// 返回按钮权限检查
+const backButton = document.getElementById('backButton');
+if (backButton) {
+    backButton.addEventListener('click', function(e) {
+        e.preventDefault(); // 阻止默认跳转
+        
+        const currentTier = localStorage.getItem('fx_userTier') || 'free';
+        
+        if (currentTier === 'free') {
+            const freeUsageCount = parseInt(localStorage.getItem('freeUsageCount') || '0');
+            const freeUsageLimit = 2;
+            
+            if (freeUsageCount >= freeUsageLimit) {
+                document.body.style.overflow = 'hidden';
+                const overlay = document.createElement('div');
+                // 确保这个遮罩层能够接收点击事件
+                overlay.className = "fixed inset-0 z-[9999] backdrop-blur-md bg-white/40 flex flex-col items-center justify-center px-4 pointer-events-auto";
+                overlay.innerHTML = `
+          <div class="bg-white p-6 sm:p-8 rounded-2xl shadow-2xl flex flex-col items-center gap-5 max-w-sm w-full border border-gray-100">
+            <div class="w-16 h-16 bg-blue-50 rounded-full flex items-center justify-center">
+              <i data-lucide="lock" class="w-8 h-8 text-[#0a2463]"></i>
+            </div>
+            <h2 class="text-2xl font-bold text-[#0a2463] text-center">
+              Free Tier Limit Reached
+            </h2>
+            <p class="text-gray-500 text-center text-sm px-2">
+              Personalized strategy recommendations: Upgrade to the Basic or Professional version to enjoy...            
+            </p>
+            <div class="flex flex-col gap-3 w-full mt-4">
+              <button onclick="alert('Redirecting to pricing...')" class="w-full bg-[#0a2463] text-white font-bold py-3 px-6 rounded-xl hover:bg-blue-900 transition-colors relative z-[10000] cursor-pointer">
+                Upgrade to Basic
+              </button>
+              <button onclick="window.location.assign('risk-report.html')" class="w-full border-2 border-[#0a2463] text-[#0a2463] font-bold py-3 px-6 rounded-xl hover:bg-gray-50 transition-colors" style="position: relative; z-index: 99999; cursor: pointer; pointer-events: auto;">
+  Go Back
+</button>
+            </div>
+          </div>
+        `;
+                document.body.appendChild(overlay);
+                
+                // 强制绑定点击事件，确保绝对能触发
+                const backBtn = document.getElementById('forceGoBackBtn');
+                if (backBtn) {
+                    backBtn.addEventListener('click', function(e) {
+                        e.preventDefault(); // 阻止可能的奇怪默认行为
+                        window.location.href = './risk-report.html'; // 强制跳转
+                    });
+                }
+
+                lucide.createIcons();
+                
+                return; // 【新增这一行】：非常关键！弹出提示后立刻停止运行，防止走到最下面的跳转
+            }
+        } // 【修复这个缺少的括号】：闭合 if (currentTier === 'free') 
+        
+        // 如果检查通过，允许返回
+        window.location.href = 'risk-report.html';
+    });
+}
 
         // 确认按钮交互 (生成动态日志并跳转)
         const confirmBtn = document.getElementById('confirmBtn');
@@ -939,8 +999,7 @@ multiViewBtn.addEventListener('click', () => {
               Free Tier Limit Reached
             </h2>
             <p class="text-gray-500 text-center text-sm px-2">
-              You've used ${freeUsageCount}/${freeUsageLimit} free reports this month. Upgrade to Basic (¥198/mo) for 8 reports/month + Strategy access.
-            </p>
+Personalized strategy recommendations: Upgrade to the Basic or Professional version to enjoy...            </p>
             <div class="flex flex-col gap-3 w-full mt-4">
               <button onclick="alert('Redirecting to pricing...')" class="w-full bg-[#0a2463] text-white font-bold py-3 px-6 rounded-xl hover:bg-blue-900 transition-colors">
                 Upgrade to Basic
@@ -1008,6 +1067,44 @@ multiViewBtn.addEventListener('click', () => {
 </script>
 
 
+<!-- Code injected by live-server -->
+<script>
+	// <![CDATA[  <-- For SVG support
+	if ('WebSocket' in window) {
+		(function () {
+			function refreshCSS() {
+				var sheets = [].slice.call(document.getElementsByTagName("link"));
+				var head = document.getElementsByTagName("head")[0];
+				for (var i = 0; i < sheets.length; ++i) {
+					var elem = sheets[i];
+					var parent = elem.parentElement || head;
+					parent.removeChild(elem);
+					var rel = elem.rel;
+					if (elem.href && typeof rel != "string" || rel.length == 0 || rel.toLowerCase() == "stylesheet") {
+						var url = elem.href.replace(/(&|\?)_cacheOverride=\d+/, '');
+						elem.href = url + (url.indexOf('?') >= 0 ? '&' : '?') + '_cacheOverride=' + (new Date().valueOf());
+					}
+					parent.appendChild(elem);
+				}
+			}
+			var protocol = window.location.protocol === 'http:' ? 'ws://' : 'wss://';
+			var address = protocol + window.location.host + window.location.pathname + '/ws';
+			var socket = new WebSocket(address);
+			socket.onmessage = function (msg) {
+				if (msg.data == 'reload') window.location.reload();
+				else if (msg.data == 'refreshcss') refreshCSS();
+			};
+			if (sessionStorage && !sessionStorage.getItem('IsThisFirstTime_Log_From_LiveServer')) {
+				console.log('Live reload enabled.');
+				sessionStorage.setItem('IsThisFirstTime_Log_From_LiveServer', true);
+			}
+		})();
+	}
+	else {
+		console.error('Upgrade your browser. This Browser is NOT supported WebSocket for Live-Reloading.');
+	}
+	// ]]>
+</script>
 </body>
 
 </html>

@@ -1,0 +1,229 @@
+// ==========================================
+// FXGuard 免费用户限制管理器
+// ==========================================
+
+// 1. 报告次数计数器
+function checkReportLimit() {
+    const currentTier = localStorage.getItem('fx_userTier') || 'free';
+    const month = new Date().toISOString().slice(0, 7); // 格式: "2026-03"
+    const key = 'fx_reportCount_' + month;
+    const used = parseInt(localStorage.getItem(key) || '0');
+    
+    const limits = {
+        free: 2,
+        basic: 8,
+        pro: Infinity
+    };
+    
+    const limit = limits[currentTier];
+    
+    return {
+        canView: used < limit,
+        used: used,
+        limit: limit,
+        remaining: limit - used,
+        tier: currentTier
+    };
+}
+
+// 2. 增加报告计数
+function incrementReportCount() {
+    const month = new Date().toISOString().slice(0, 7);
+    const key = 'fx_reportCount_' + month;
+    const used = parseInt(localStorage.getItem(key) || '0');
+    localStorage.setItem(key, used + 1);
+}
+
+// 3. 显示次数用完的锁定页面（用在 risk-report.html）
+function showReportLimitReached() {
+    const tier = localStorage.getItem('fx_userTier') || 'free';
+    const info = checkReportLimit();
+    
+    let message = '';
+    if (tier === 'free') {
+        message = `
+            <div class="min-h-screen flex items-center justify-center bg-gradient-to-br from-blue-50 to-indigo-50 p-6">
+                <div class="max-w-md w-full bg-white rounded-lg shadow-2xl p-8 text-center">
+                    <div class="w-20 h-20 bg-red-100 rounded-full flex items-center justify-center mx-auto mb-6">
+                        <i data-lucide="lock" class="w-10 h-10 text-red-600"></i>
+                    </div>
+                    <h1 class="text-3xl font-bold text-[#0a2463] mb-4">Monthly Limit Reached</h1>
+                    <p class="text-gray-600 mb-6 text-lg">
+                        You've used all <strong>${info.limit}</strong> free risk reports this month.
+                    </p>
+                    <div class="bg-blue-50 border-2 border-blue-200 rounded-lg p-4 mb-6">
+                        <p class="text-sm text-gray-700 font-semibold mb-2">Upgrade to continue:</p>
+                        <p class="text-2xl font-bold text-[#0a2463]">¥198/month</p>
+                        <p class="text-sm text-gray-500">Get 8 reports/month + Rate Alerts</p>
+                    </div>
+                    <button onclick="alert('Redirecting to pricing...')" 
+                        class="w-full bg-[#0a2463] hover:bg-blue-900 text-white font-bold py-3 px-6 rounded-lg shadow-lg transition-all mb-4">
+                        Upgrade to Basic →
+                    </button>
+                    <a href="dashboard.html" class="text-sm text-gray-500 hover:text-gray-700">
+                        Back to Dashboard
+                    </a>
+                </div>
+            </div>
+        `;
+    } else if (tier === 'basic') {
+        message = `
+            <div class="min-h-screen flex items-center justify-center bg-gradient-to-br from-blue-50 to-indigo-50 p-6">
+                <div class="max-w-md w-full bg-white rounded-lg shadow-2xl p-8 text-center">
+                    <div class="w-20 h-20 bg-amber-100 rounded-full flex items-center justify-center mx-auto mb-6">
+                        <i data-lucide="calendar" class="w-10 h-10 text-amber-600"></i>
+                    </div>
+                    <h1 class="text-3xl font-bold text-[#0a2463] mb-4">Monthly Limit Reached</h1>
+                    <p class="text-gray-600 mb-6 text-lg">
+                        You've used all <strong>8</strong> risk reports this month.
+                    </p>
+                    <div class="bg-blue-50 border-2 border-blue-200 rounded-lg p-4 mb-6">
+                        <p class="text-sm text-gray-700">Resets on: <strong>${getNextMonthDate()}</strong></p>
+                    </div>
+                    <button onclick="alert('Upgrade to Pro for unlimited reports!')" 
+                        class="w-full bg-[#0a2463] hover:bg-blue-900 text-white font-bold py-3 px-6 rounded-lg shadow-lg transition-all mb-4">
+                        Upgrade to Pro (Unlimited) →
+                    </button>
+                    <a href="dashboard.html" class="text-sm text-gray-500 hover:text-gray-700">
+                        Back to Dashboard
+                    </a>
+                </div>
+            </div>
+        `;
+    }
+    
+    document.body.innerHTML = message;
+    if (typeof lucide !== 'undefined') lucide.createIcons();
+}
+
+// 4. 显示Strategy页面的完全锁定界面（免费用户专用）
+function showStrategyLockedPage() {
+    const lockedHTML = `
+        <div class="min-h-screen flex items-center justify-center bg-gradient-to-br from-blue-50 to-indigo-50 p-6">
+            <div class="max-w-lg w-full bg-white rounded-lg shadow-2xl p-10 text-center">
+                <div class="w-24 h-24 bg-blue-100 rounded-full flex items-center justify-center mx-auto mb-6">
+                    <i data-lucide="lock" class="w-12 h-12 text-[#0a2463]"></i>
+                </div>
+                <h1 class="text-4xl font-bold text-[#0a2463] mb-4">Unlock Your Hedging Strategy</h1>
+                <p class="text-gray-600 mb-3 text-lg leading-relaxed">
+                    You've seen your risk exposure.
+                </p>
+                <p class="text-gray-600 mb-6 text-lg leading-relaxed">
+                    Now find out <strong>exactly what to do</strong> about it.
+                </p>
+                <div class="bg-gradient-to-r from-blue-50 to-indigo-100 border-2 border-[#0a2463] rounded-lg p-6 mb-8">
+                    <p class="text-sm text-gray-700 font-semibold mb-3">Basic Plan includes:</p>
+                    <ul class="text-left text-sm text-gray-700 space-y-2">
+                        <li class="flex items-center gap-2">
+                            <i data-lucide="check-circle" class="w-4 h-4 text-green-600"></i>
+                            Personalized hedging recommendations
+                        </li>
+                        <li class="flex items-center gap-2">
+                            <i data-lucide="check-circle" class="w-4 h-4 text-green-600"></i>
+                            8 risk reports per month
+                        </li>
+                        <li class="flex items-center gap-2">
+                            <i data-lucide="check-circle" class="w-4 h-4 text-green-600"></i>
+                            Real-time rate alerts
+                        </li>
+                        <li class="flex items-center gap-2">
+                            <i data-lucide="check-circle" class="w-4 h-4 text-green-600"></i>
+                            Quick access to settlement platforms
+                        </li>
+                    </ul>
+                    <p class="text-3xl font-bold text-[#0a2463] mt-4">¥198/month</p>
+                </div>
+                <button onclick="alert('Redirecting to pricing...')" 
+                    class="w-full bg-[#0a2463] hover:bg-blue-900 text-white font-bold py-4 px-8 rounded-lg shadow-lg transition-all mb-4 text-lg">
+                    Upgrade to Basic →
+                </button>
+                <p class="text-sm text-gray-500">
+                    Already have an account? <a href="login.html" class="text-[#0a2463] hover:underline font-semibold">Sign in</a>
+                </p>
+            </div>
+        </div>
+    `;
+    
+    document.body.innerHTML = lockedHTML;
+    if (typeof lucide !== 'undefined') lucide.createIcons();
+}
+
+// 5. 显示升级弹窗（用在 risk-report.html 的按钮点击）
+function showUpgradeModal(context = 'strategy') {
+    // 检查是否已存在弹窗
+    if (document.getElementById('upgradeModal')) return;
+    
+    const modal = document.createElement('div');
+    modal.id = 'upgradeModal';
+    modal.className = 'fixed inset-0 bg-black/50 flex items-center justify-center z-[9999] p-6';
+    
+    let content = '';
+    if (context === 'strategy') {
+        content = `
+            <div class="bg-white rounded-lg shadow-2xl max-w-md w-full p-8 relative">
+                <button onclick="document.getElementById('upgradeModal').remove()" 
+                    class="absolute top-4 right-4 text-gray-400 hover:text-gray-600">
+                    <i data-lucide="x" class="w-6 h-6"></i>
+                </button>
+                <div class="w-16 h-16 bg-blue-100 rounded-full flex items-center justify-center mx-auto mb-4">
+                    <i data-lucide="zap" class="w-8 h-8 text-[#0a2463]"></i>
+                </div>
+                <h2 class="text-2xl font-bold text-[#0a2463] mb-3 text-center">Your Risk Analysis is Ready</h2>
+                <p class="text-gray-600 mb-6 text-center">
+                    Upgrade to <strong>Basic (¥198/mo)</strong> to unlock your personalized hedging strategy.
+                </p>
+                <div class="flex gap-3">
+                    <button onclick="alert('Redirecting to pricing...')" 
+                        class="flex-1 bg-[#0a2463] hover:bg-blue-900 text-white font-bold py-3 px-4 rounded-lg shadow-lg transition-all">
+                        Upgrade Now
+                    </button>
+                    <button onclick="document.getElementById('upgradeModal').remove()" 
+                        class="flex-1 bg-gray-100 hover:bg-gray-200 text-gray-700 font-bold py-3 px-4 rounded-lg transition-all">
+                        Maybe Later
+                    </button>
+                </div>
+            </div>
+        `;
+    }
+    
+    modal.innerHTML = content;
+    document.body.appendChild(modal);
+    if (typeof lucide !== 'undefined') lucide.createIcons();
+}
+
+// 6. 在 Dashboard 显示剩余次数
+function renderReportCounter() {
+    const info = checkReportLimit();
+    if (info.tier === 'pro') return ''; // Pro 用户不显示
+    
+    const percentage = (info.used / info.limit) * 100;
+    let colorClass = 'text-green-600';
+    if (percentage >= 80) colorClass = 'text-red-600';
+    else if (percentage >= 50) colorClass = 'text-amber-600';
+    
+    return `
+    <div class="bg-white border-2 border-gray-200 rounded-lg p-4 mb-6">
+        <div class="flex items-center justify-between mb-2">
+            <span class="text-sm font-semibold text-gray-700">Risk Reports This Month</span>
+            <span class="text-lg font-bold ${colorClass}">${info.used} / ${info.limit}</span>
+        </div>
+        <div class="w-full bg-gray-200 rounded-full h-2">
+            <div id="reportProgressBar" class="bg-[#0a2463] h-2 rounded-full transition-all"></div>
+        </div>
+        ${info.remaining === 0 ? 
+            '<p class="text-xs text-red-600 mt-2 font-semibold">Limit reached. Resets next month.</p>' :
+            `<p class="text-xs text-gray-500 mt-2">${info.remaining} report${info.remaining > 1 ? 's' : ''} remaining</p>`
+        }
+    </div>
+    <script>
+        document.getElementById('reportProgressBar').style.width = '${percentage}%';
+    </script>
+`;
+}
+
+// 辅助函数：获取下个月第一天
+function getNextMonthDate() {
+    const now = new Date();
+    const next = new Date(now.getFullYear(), now.getMonth() + 1, 1);
+    return next.toLocaleDateString('en-US', { month: 'long', day: 'numeric', year: 'numeric' });
+}

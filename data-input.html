@@ -42,7 +42,7 @@
 
 <div class="bg-blue-50 text-blue-800 text-sm p-3 rounded-md mb-6 flex items-start gap-2 border border-blue-100">
             <i data-lucide="info" class="w-5 h-5 mt-0.5 shrink-0"></i> 
-            <p>You can change currency pairs at any time. Each analysis is calculated independently.</p>
+            <p>For Pro Users: You can change currency pairs at any time. Each analysis is calculated independently.</p>
         </div>
 
 
@@ -356,7 +356,8 @@
                 localStorage.setItem("settlementPeriod", document.getElementById(`period_${fallbackCurr}`).value);
                 
                 if(slider) localStorage.setItem("riskTolerance", slider.value);
-                
+                localStorage.setItem('fx_fromDataInput', 'true');
+window.location.href = './risk-report.html';
                 window.location.href = './risk-report.html';
             });
         }
