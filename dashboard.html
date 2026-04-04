@@ -56,7 +56,7 @@
                     </div>
                 </div>
                 <div class="flex items-center gap-3 shrink-0">
-                    <a href="strategy.html?mode=extreme" class="text-xs font-bold bg-[#E24B4A] text-white px-4 py-2 rounded hover:bg-red-700 transition-colors">View Full Hedge Strategy →</a>
+
                     <a href="https://cn.reuters.com/markets/" target="_blank" class="text-xs font-bold text-[#E24B4A] border border-[#E24B4A] px-4 py-2 rounded hover:bg-red-50 transition-colors">Latest Market News →</a>
                     <button id="closeExtremeBannerBtn" class="text-red-400 hover:text-red-700 ml-2">
                         <i data-lucide="x" class="w-5 h-5"></i>
@@ -66,10 +66,24 @@
         </div>
 
         <!-- 欢迎语 -->
-        <div class="mb-8">
-            <h2 class="text-3xl font-bold text-[#0a2463] mb-2">Welcome Back!</h2>
-            <p class="text-gray-600">Platform: <span id="displayPlatform" class="font-semibold">Shopee</span> | Settlement Currency: <span id="displayCurrency" class="font-semibold">MYR</span></p>
-        </div>
+<div class="mb-8 flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4">
+    <div>
+        <h2 class="text-3xl font-bold text-[#0a2463] mb-2">Welcome Back!</h2>
+        <p class="text-gray-600">Platform: <span id="displayPlatform" class="font-semibold">Shopee</span> | Settlement Currency: <span id="displayCurrency" class="font-semibold">MYR</span></p>
+    </div>
+    <div class="flex items-center gap-2 shrink-0">
+        <button id="triggerExtremeBtn"
+            class="flex items-center gap-1.5 bg-red-100 text-red-700 text-xs font-bold px-3 py-2 rounded hover:bg-red-200 border border-red-300 transition-colors"
+            title="Demo: simulate extreme volatility signal">
+            <i data-lucide="zap" class="w-3.5 h-3.5"></i> Simulate Extreme
+        </button>
+        <button id="resetExtremeBtn"
+            class="flex items-center gap-1.5 bg-gray-100 text-gray-500 text-xs font-bold px-3 py-2 rounded hover:bg-gray-200 border border-gray-300 transition-colors"
+            title="Clear extreme volatility mode">
+            <i data-lucide="rotate-ccw" class="w-3.5 h-3.5"></i> Reset
+        </button>
+    </div>
+</div>
 
         <!-- 第一排：数据统计网格 -->
         <div class="grid grid-cols-1 md:grid-cols-3 gap-6 mb-8">
@@ -160,14 +174,14 @@
     <div id="alertSettingsPanel" class="bg-white p-6 rounded-lg shadow border border-gray-100 col-span-1 flex flex-col">
         <div class="flex justify-between items-center mb-2">
             <h3 class="text-xl font-bold text-[#0A2463]">Alert Settings</h3>
-            <div class="flex gap-2">
-                <button id="demoAlertBtn" class="bg-yellow-100 text-yellow-700 text-xs font-bold px-3 py-1 rounded hover:bg-yellow-200 border border-yellow-300">
-                    Simulate Alert
-                </button>
-                <button id="triggerExtremeBtn" class="bg-red-100 text-red-700 text-xs font-bold px-3 py-1 rounded hover:bg-red-200 border border-red-300">
-                    Extreme Warning
-                </button>
-            </div>
+          <div class="flex gap-2">
+    <button id="demoAlertBtn" class="bg-yellow-100 text-yellow-700 text-xs font-bold px-3 py-1 rounded hover:bg-yellow-200 border border-yellow-300">
+        Simulate Alert
+    </button>
+</div>  
+<button id="resetExtremeBtn" class="bg-gray-100 text-gray-600 text-xs font-bold px-3 py-1 rounded hover:bg-gray-200 border border-gray-300" title="Reset extreme mode">
+    Reset
+</button>
         </div>
         <p id="alertUsageText" class="text-sm text-gray-500 font-medium mb-4">Alert Lines: 0 / 1 used</p>
         
@@ -746,23 +760,38 @@ document.addEventListener('DOMContentLoaded', () => {
         }
     }
     
-    // 4. 更新"已使用/总数"显示
+// 4. 更新"已使用/总数"显示并动态处理 Tooltip
     function updateUsageDisplay() {
         const alerts = getAlerts();
         const usedCount = alerts.length;
         alertUsageText.textContent = `Alert Lines: ${usedCount} / ${maxAlerts} used`;
         
-        // 如果达到上限，显示警告并禁用按钮
+        // 如果达到或超过上限，禁用按钮并显示提示
         if (usedCount >= maxAlerts) {
-            alertWarningMsg.classList.remove('hidden');
             saveAlertBtn.disabled = true;
-            saveAlertBtn.classList.add('opacity-50', 'cursor-not-allowed'); // ← 添加灰色样式
+            // 添加 opacity-50 让按钮变灰，cursor-not-allowed 显示红色的禁用鼠标指针
+            saveAlertBtn.classList.add('opacity-50', 'cursor-not-allowed'); 
             saveAlertBtn.textContent = 'Limit Reached';
+            
+            // 根据当前账户等级 (userTier) 动态设置 Tooltip 和下方警告文字
+            if (currentTier === 'basic') {
+                saveAlertBtn.title = 'Upgrade to Pro for unlimited alerts'; // 这是原生的 Tooltip
+                alertWarningMsg.innerHTML = "You've reached the Basic limit (1 alert). <br>Upgrade to Pro for unlimited alerts.";
+            }  else {
+                saveAlertBtn.title = 'Upgrade to unlock alerts';
+                alertWarningMsg.innerHTML = "Please upgrade your tier to use alerts.";
+            }
+            
+            alertWarningMsg.classList.remove('hidden'); // 把下方的警告文本显示出来
+            
         } else {
-            alertWarningMsg.classList.add('hidden');
+            // 如果还没达到上限，恢复正常的按钮状态
             saveAlertBtn.disabled = false;
-            saveAlertBtn.classList.remove('opacity-50', 'cursor-not-allowed'); // ← 移除灰色样式
+            saveAlertBtn.classList.remove('opacity-50', 'cursor-not-allowed'); // 移除禁用样式
             saveAlertBtn.textContent = 'Save Settings';
+            saveAlertBtn.title = ''; // 清空 Tooltip，以免误导用户
+            
+            alertWarningMsg.classList.add('hidden'); // 隐藏下方的警告文本
         }
     }
     
@@ -913,74 +942,78 @@ document.addEventListener('DOMContentLoaded', () => {
     </script>
 
 <script>
-        document.addEventListener('DOMContentLoaded', () => {
-            const extremeBanner = document.getElementById('extremeVolatilityBanner');
-            const closeExtremeBtn = document.getElementById('closeExtremeBannerBtn');
-            const triggerExtremeBtn = document.getElementById('triggerExtremeBtn');
-            
-            // 获取今天的日期，用于localStorage
-            const today = new Date().toISOString().split('T')[0];
-            const isClosedToday = localStorage.getItem('extremeBannerClosed') === today;
-
-            // 如果今天没关过，且之前激活了极端模式，就显示横幅
-            if (!isClosedToday && localStorage.getItem('isExtremeMode') === 'true') {
-                extremeBanner.classList.remove('hidden');
-                if(typeof lucide !== 'undefined') lucide.createIcons();
-            }
-            // 给 Extreme Warning 按钮绑定点击事件
-            if (triggerExtremeBtn && extremeBanner) {
-                triggerExtremeBtn.addEventListener('click', () => {
-                    // 1. 强制在本地缓存中开启极端模式
-                    localStorage.setItem('isExtremeMode', 'true');
-                    
-                    // 2. 清除可能存在的“今天已关闭”记录，防止横幅被拦截
-                    localStorage.removeItem('extremeBannerClosed');
-                    
-                    // 3. 移除隐藏样式，显示顶部红色横幅
-                    extremeBanner.classList.remove('hidden');
-                    
-                    // 4. 重新渲染横幅里的警告图标
-                    if(typeof lucide !== 'undefined') lucide.createIcons();
-                    
-                    // 5. 页面平滑滚动回顶部，确保你能立刻看到横幅
-                    window.scrollTo({ top: 0, behavior: 'smooth' });
-                });
-            }
-
-// 演示按钮：点击触发波动率大于均值2倍的警告
-           // 自动检测极端波动率
-function checkExtremeVolatility() {
-    const currentVolatility = parseFloat(localStorage.getItem('currentVolatility') || '0.023');
-    const historicalMeanVolatility = 0.018;
-    const historicalStdVolatility = 0.005;
-    
-    const threshold = historicalMeanVolatility + 2 * historicalStdVolatility;
-    
-    if (currentVolatility > threshold) {
-        localStorage.setItem('isExtremeMode', 'true');
-        
+    document.addEventListener('DOMContentLoaded', () => {
         const extremeBanner = document.getElementById('extremeVolatilityBanner');
-        if (extremeBanner) {
-            extremeBanner.classList.remove('hidden');
-            if(typeof lucide !== 'undefined') lucide.createIcons();
-        }
-    } else {
-        localStorage.removeItem('isExtremeMode');
-    }
-}
+        const closeExtremeBtn = document.getElementById('closeExtremeBannerBtn');
+        const triggerExtremeBtn = document.getElementById('triggerExtremeBtn');
+        const resetExtremeBtn = document.getElementById('resetExtremeBtn');
 
-checkExtremeVolatility();
-setInterval(checkExtremeVolatility, 5 * 60 * 1000);
-
-            // 关闭按钮：当天不再显示
-            if (closeExtremeBtn) {
-                closeExtremeBtn.addEventListener('click', () => {
-                    extremeBanner.classList.add('hidden');
-                    localStorage.setItem('extremeBannerClosed', today);
-                });
+        // 显示/隐藏横幅的统一函数
+        function showBanner() {
+            if (extremeBanner) {
+                extremeBanner.classList.remove('hidden');
+                if (typeof lucide !== 'undefined') lucide.createIcons();
             }
-        });
-    </script>
+        }
+        function hideBanner() {
+            if (extremeBanner) extremeBanner.classList.add('hidden');
+        }
+
+        // 页面加载时：只根据 isExtremeMode 决定是否显示，不再有"今天已关闭"逻辑
+        // 因为 Reset 按钮会彻底清除 isExtremeMode，关闭横幅 X 只是视觉隐藏
+        if (localStorage.getItem('isExtremeMode') === 'true') {
+            showBanner();
+        }
+
+        // 🔴 Simulate Extreme 按钮：写入超标波动率，激活极端模式
+        if (triggerExtremeBtn) {
+            triggerExtremeBtn.addEventListener('click', () => {
+                localStorage.setItem('currentVolatility', '0.035'); // 超过阈值 0.028
+                localStorage.setItem('isExtremeMode', 'true');
+                showBanner();
+                window.scrollTo({ top: 0, behavior: 'smooth' });
+            });
+        }
+
+        // Reset 按钮：完全解除极端模式，刷新后也不再显示
+        if (resetExtremeBtn) {
+            resetExtremeBtn.addEventListener('click', () => {
+                localStorage.setItem('currentVolatility', '0.023'); // 恢复正常波动率
+                localStorage.removeItem('isExtremeMode');
+                localStorage.removeItem('extremeOverride');
+                hideBanner();
+            });
+        }
+
+        // 横幅右上角 X：只在本次会话里隐藏横幅，不清除 isExtremeMode
+        // 刷新后仍会再次显示（因为模式还没解除）
+        if (closeExtremeBtn) {
+            closeExtremeBtn.addEventListener('click', () => {
+                hideBanner();
+                // 注意：不清除 isExtremeMode，只是视觉上关闭
+                // 用户若想彻底解除，应点 Reset
+            });
+        }
+
+        // 自动检测波动率（每5分钟跑一次）
+        function checkExtremeVolatility() {
+            const currentVolatility = parseFloat(localStorage.getItem('currentVolatility') || '0.023');
+            const threshold = 0.018 + 2 * 0.005; // 均值 + 2倍标准差 = 0.028
+
+            if (currentVolatility > threshold) {
+                localStorage.setItem('isExtremeMode', 'true');
+                showBanner();
+            } else {
+                // 波动率已回落：自动解除极端模式
+                localStorage.removeItem('isExtremeMode');
+                hideBanner();
+            }
+        }
+
+        checkExtremeVolatility();
+        setInterval(checkExtremeVolatility, 5 * 60 * 1000);
+    });
+</script>
 
 <script>
     // 更新Recent Strategies卡片

@@ -121,49 +121,133 @@
 <div id="currencyInputGroups" class="space-y-4 mb-8 mt-2">
             </div>
 
-            <!-- 风险承受能力 -->
-            <div class="space-y-6">
-                <label class="text-[#0a2463] font-bold text-lg block">Risk Tolerance</label>
-                <div class="px-6 py-10 bg-gray-50 border-2 border-gray-200 rounded-sm">
-                    <div class="mb-8">
-                        <input type="range" id="riskSlider" min="0" max="100" value="50" step="1"
-                            class="w-full h-2 bg-gray-300 rounded-lg appearance-none cursor-pointer accent-[#0a2463] mb-6">
-                        <div class="flex justify-between items-center text-sm text-gray-600 mb-8">
-                            <span class="font-semibold">0% Conservative</span>
-                            <span class="font-semibold">50% Balanced</span>
-                            <span class="font-semibold">100% Aggressive</span>
-                        </div>
-                    </div>
-                    <div class="text-center p-6 bg-white border-2 border-[#0a2463] rounded-sm">
-                        <p class="text-sm text-gray-600 mb-2">Your Selected Risk Level</p>
-                        <div class="flex items-center justify-center gap-3">
-                            <span id="riskValueDisplay" class="text-5xl font-bold text-yellow-600">50%</span>
-                            <span id="riskLabelDisplay" class="text-2xl font-bold text-yellow-600">Balanced</span>
-                        </div>
-                    </div>
-                </div>
-                <div class="grid grid-cols-3 gap-4 text-sm">
-                    <div class="text-center p-4 bg-green-50 border border-green-200 rounded-sm">
-                        <p class="font-bold text-green-700 mb-1">0-33% Conservative</p>
-                        <p class="text-xs text-gray-600">Minimize risk, accept lower returns</p>
-                    </div>
-                    <div class="text-center p-4 bg-yellow-50 border border-yellow-200 rounded-sm">
-                        <p class="font-bold text-yellow-700 mb-1">34-66% Balanced</p>
-                        <p class="text-xs text-gray-600">Balance risk and opportunity</p>
-                    </div>
-                    <div class="text-center p-4 bg-red-50 border border-red-200 rounded-sm">
-                        <p class="font-bold text-red-700 mb-1">67-100% Aggressive</p>
-                        <p class="text-xs text-gray-600">Accept higher risk for potential gains</p>
-                    </div>
-                </div>
-            </div>
+<!-- Risk Profile Questionnaire -->
+<div class="space-y-6">
+    <label class="text-[#0a2463] font-bold text-lg block">Risk Profile</label>
 
-            <div class="pt-6">
-                <button type="submit"
-                    class="w-full h-14 bg-[#0a2463] hover:bg-[#1e3a8a] text-white font-bold text-lg rounded-md transition-colors">
-                    Submit & Analyze Risk
-                </button>
+    <!-- Tab Toggle -->
+    <div class="flex gap-2 p-1 bg-gray-100 rounded-md">
+        <button type="button" id="tabQuick"
+            onclick="switchRiskTab('quick')"
+            class="flex-1 py-2 text-sm font-semibold rounded-md bg-[#0a2463] text-white transition-all">
+            Quick Setup
+        </button>
+        <button type="button" id="tabCustom"
+            onclick="switchRiskTab('custom')"
+            class="flex-1 py-2 text-sm font-semibold rounded-md text-gray-500 transition-all hover:text-gray-700">
+            Custom Setup
+        </button>
+    </div>
+
+    <!-- Panel A: Quick Setup (Questionnaire) -->
+    <div id="panelQuick" class="space-y-4">
+
+        <!-- Question 1 -->
+        <div class="bg-gray-50 border-2 border-gray-200 rounded-sm px-6 py-5">
+            <p class="font-semibold text-gray-800 mb-4">When do you need to use these funds?</p>
+            <div class="space-y-3">
+                <label class="flex items-center gap-3 p-3 bg-white border border-gray-200 rounded-md cursor-pointer hover:bg-blue-50 transition-colors">
+                    <input type="radio" name="urgency" value="urgent" class="w-4 h-4 accent-[#0a2463]">
+                    <span class="text-gray-700">Within 1 month — need to pay supplier soon</span>
+                </label>
+                <label class="flex items-center gap-3 p-3 bg-white border border-gray-200 rounded-md cursor-pointer hover:bg-blue-50 transition-colors">
+                    <input type="radio" name="urgency" value="medium" class="w-4 h-4 accent-[#0a2463]">
+                    <span class="text-gray-700">1–3 months — no immediate rush</span>
+                </label>
+                <label class="flex items-center gap-3 p-3 bg-white border border-gray-200 rounded-md cursor-pointer hover:bg-blue-50 transition-colors">
+                    <input type="radio" name="urgency" value="flexible" class="w-4 h-4 accent-[#0a2463]">
+                    <span class="text-gray-700">3+ months — not urgent at all</span>
+                </label>
             </div>
+        </div>
+
+        <!-- Question 2 -->
+        <div class="bg-gray-50 border-2 border-gray-200 rounded-sm px-6 py-5">
+            <p class="font-semibold text-gray-800 mb-4">What is your current cash flow situation?</p>
+            <div class="space-y-3">
+                <label class="flex items-center gap-3 p-3 bg-white border border-gray-200 rounded-md cursor-pointer hover:bg-blue-50 transition-colors">
+                    <input type="radio" name="cashflow" value="tight" class="w-4 h-4 accent-[#0a2463]">
+                    <span class="text-gray-700">Tight — need to be cautious with every move</span>
+                </label>
+                <label class="flex items-center gap-3 p-3 bg-white border border-gray-200 rounded-md cursor-pointer hover:bg-blue-50 transition-colors">
+                    <input type="radio" name="cashflow" value="normal" class="w-4 h-4 accent-[#0a2463]">
+                    <span class="text-gray-700">Normal — some buffer available</span>
+                </label>
+                <label class="flex items-center gap-3 p-3 bg-white border border-gray-200 rounded-md cursor-pointer hover:bg-blue-50 transition-colors">
+                    <input type="radio" name="cashflow" value="healthy" class="w-4 h-4 accent-[#0a2463]">
+                    <span class="text-gray-700">Healthy — comfortable absorbing some volatility</span>
+                </label>
+            </div>
+        </div>
+
+        <!-- Suggested Result + nudge to custom -->
+        <div id="quickResultBox" class="hidden text-center p-5 bg-white border-2 border-[#0a2463] rounded-sm">
+            <p class="text-sm text-gray-500 mb-1">System Suggestion</p>
+            <span id="riskLabelDisplay" class="text-2xl font-bold text-yellow-600"></span>
+            <p class="text-xs text-gray-400 mt-3">
+                Based on your answers, we suggest the profile above.
+                <button type="button" onclick="switchRiskTab('custom')"
+                    class="text-[#0a2463] underline font-medium hover:opacity-70">
+                    Click here to adjust manually.
+                </button>
+            </p>
+        </div>
+    </div>
+
+    <!-- Panel B: Custom Setup (Slider) -->
+    <div id="panelCustom" class="hidden space-y-4">
+        <div class="px-6 py-8 bg-gray-50 border-2 border-gray-200 rounded-sm">
+            <div class="mb-6">
+                <input type="range" id="riskSlider" min="0" max="100" value="50" step="1"
+                    class="w-full h-2 bg-gray-300 rounded-lg appearance-none cursor-pointer accent-[#0a2463] mb-4">
+                <div class="flex justify-between text-xs text-gray-500">
+                    <span>0% — Conservative</span>
+                    <span>50% — Moderate</span>
+                    <span>100% — Aggressive</span>
+                </div>
+            </div>
+            <div class="text-center p-5 bg-white border-2 border-[#0a2463] rounded-sm">
+                <p class="text-sm text-gray-500 mb-1">Your Selected Risk Level</p>
+                <div class="flex items-center justify-center gap-3">
+                    <span id="sliderValueDisplay" class="text-4xl font-bold text-yellow-600">50%</span>
+                    <span id="sliderLabelDisplay" class="text-2xl font-bold text-yellow-600">Moderate</span>
+                </div>
+            </div>
+        </div>
+        <div class="grid grid-cols-3 gap-3 text-xs text-center">
+            <div class="p-3 bg-green-50 border border-green-200 rounded-sm">
+                <p class="font-bold text-green-700 mb-1">0–33% Conservative</p>
+                <p class="text-gray-500">Minimize risk, accept lower returns</p>
+            </div>
+            <div class="p-3 bg-yellow-50 border border-yellow-200 rounded-sm">
+                <p class="font-bold text-yellow-700 mb-1">34–66% Moderate</p>
+                <p class="text-gray-500">Balance risk and opportunity</p>
+            </div>
+            <div class="p-3 bg-red-50 border border-red-200 rounded-sm">
+                <p class="font-bold text-red-700 mb-1">67–100% Aggressive</p>
+                <p class="text-gray-500">Accept higher risk for potential gains</p>
+            </div>
+        </div>
+    </div>
+</div>
+
+            <!-- 极端市场警示框（正常情况下隐藏，极端模式下自动显示） -->
+<div id="extremeWarningBox" class="hidden mt-6 p-4 bg-red-50 border-2 border-[#E24B4A] rounded-md">
+    <div class="flex items-start gap-3">
+        <i data-lucide="alert-triangle" class="w-5 h-5 text-[#E24B4A] shrink-0 mt-0.5"></i>
+        <div>
+            <p class="font-bold text-[#E24B4A] text-sm mb-1">⚠️ Extreme Market Volatility Detected</p>
+            <p class="text-sm text-red-900">Current exchange rate volatility is significantly above historical norms. FXGuard recommends a <strong>Conservative</strong> hedging strategy to protect your profits during this period.</p>
+        </div>
+    </div>
+</div>
+
+<div class="pt-6">
+    <button type="submit"
+        class="w-full h-14 bg-[#0a2463] hover:bg-[#1e3a8a] text-white font-bold text-lg rounded-md transition-colors">
+        Submit & Analyze Risk
+    </button>
+</div>
         </form>
     </div>
 
@@ -185,7 +269,46 @@
             <span class="text-[10px] mt-1">Profile</span>
         </a>
     </div>
+<!-- 极端市场风险确认弹窗 -->
+<div id="extremeConfirmModal" class="fixed inset-0 bg-black bg-opacity-60 hidden items-center justify-center z-[9999]">
+    <div class="bg-white rounded-xl p-6 max-w-md w-full mx-4 shadow-2xl">
+        <div class="flex items-center gap-3 mb-4">
+            <div class="w-10 h-10 bg-red-100 rounded-full flex items-center justify-center shrink-0">
+                <i data-lucide="alert-triangle" class="w-5 h-5 text-[#E24B4A]"></i>
+            </div>
+            <h2 class="text-lg font-bold text-gray-900">Extreme Market Warning</h2>
+        </div>
 
+        <div class="bg-red-50 border border-red-200 rounded-md p-3 mb-3">
+            <p class="text-sm text-red-900">
+                <strong>Current market is in extreme volatility.</strong>
+                FXGuard recommends <strong>Conservative</strong> strategy,
+                but your current selection is <strong id="userChoiceLabel">Moderate</strong>.
+            </p>
+        </div>
+
+        <p id="extremeModalDesc" class="text-sm text-gray-600 mb-5">
+            During extreme volatility, non-conservative strategies carry significantly higher tail risk.
+        </p>
+
+        <!-- 按钮区：JS动态控制显示哪些 -->
+        <div class="flex flex-col gap-2">
+            <button id="extremeModalSwitchBtn"
+                class="w-full py-2.5 bg-[#0a2463] text-white font-bold rounded-md hover:bg-blue-900 transition-colors text-sm">
+                Switch to Conservative
+            </button>
+            <button id="extremeModalProceedBtn"
+                class="w-full py-2.5 bg-white border-2 border-gray-300 text-gray-700 font-bold rounded-md hover:bg-gray-50 transition-colors text-sm">
+                Proceed with my choice
+            </button>
+            <!-- 只在Quick模式显示 -->
+            <button id="extremeModalStayBtn"
+                class="hidden w-full py-2.5 bg-white border border-gray-200 text-gray-500 font-medium rounded-md hover:bg-gray-50 transition-colors text-sm">
+                Stay here &amp; set up Custom risk profile
+            </button>
+        </div>
+    </div>
+</div>
     <script src="./tier-manager.js"></script>
 
     <script>
@@ -193,39 +316,106 @@
         if (typeof lucide !== 'undefined') {
             lucide.createIcons();
         }
+        // 如果是极端模式，显示页面顶部的警示框
+if (localStorage.getItem('isExtremeMode') === 'true') {
+    const box = document.getElementById('extremeWarningBox');
+    if (box) {
+        box.classList.remove('hidden');
+        if (typeof lucide !== 'undefined') lucide.createIcons();
+    }
+}
 
-        // ==========================================
-        // A. 风险滑块与颜色动态联动 (补回了你丢失的代码)
-        // ==========================================
+// ==========================================
+// A. Risk Profile — Quick Setup + Custom Setup
+// ==========================================
+
+// Tab switcher
+function switchRiskTab(tab) {
+    const panelQuick  = document.getElementById('panelQuick');
+    const panelCustom = document.getElementById('panelCustom');
+    const tabQuick    = document.getElementById('tabQuick');
+    const tabCustom   = document.getElementById('tabCustom');
+
+    if (tab === 'quick') {
+        panelQuick.classList.remove('hidden');
+        panelCustom.classList.add('hidden');
+        tabQuick.classList.add('bg-[#0a2463]', 'text-white');
+        tabQuick.classList.remove('text-gray-500');
+        tabCustom.classList.remove('bg-[#0a2463]', 'text-white');
+        tabCustom.classList.add('text-gray-500');
+    } else {
+        panelCustom.classList.remove('hidden');
+        panelQuick.classList.add('hidden');
+        tabCustom.classList.add('bg-[#0a2463]', 'text-white');
+        tabCustom.classList.remove('text-gray-500');
+        tabQuick.classList.remove('bg-[#0a2463]', 'text-white');
+        tabQuick.classList.add('text-gray-500');
+        // Pre-fill slider with whatever questionnaire mapped, if available
+        const saved = localStorage.getItem('riskTolerance');
         const slider = document.getElementById('riskSlider');
-        const riskValueDisplay = document.getElementById('riskValueDisplay');
-        const riskLabelDisplay = document.getElementById('riskLabelDisplay');
+        if (saved && slider) { slider.value = saved; updateSliderDisplay(saved); }
+    }
+}
 
-        if (slider && riskValueDisplay && riskLabelDisplay) {
-            function updateRiskDisplay(value) {
-                const n = parseInt(value);
-                let label = "Balanced";
-                let color = "text-yellow-600";
+// Questionnaire mapping logic
+function mapRiskPreference(urgency, cashflow) {
+    if (urgency === 'urgent' || cashflow === 'tight') return 'conservative';
+    if (urgency === 'medium' && cashflow === 'normal') return 'moderate';
+    return 'aggressive';
+}
 
-                if (n <= 33) {
-                    label = "Conservative";
-                    color = "text-green-600";
-                } else if (n >= 67) {
-                    label = "Aggressive";
-                    color = "text-red-600";
-                }
+function updateRiskDisplay() {
+    const urgencyEl  = document.querySelector('input[name="urgency"]:checked');
+    const cashflowEl = document.querySelector('input[name="cashflow"]:checked');
+    const resultBox  = document.getElementById('quickResultBox');
+    const labelEl    = document.getElementById('riskLabelDisplay');
+    if (!urgencyEl || !cashflowEl || !resultBox || !labelEl) return;
 
-                riskValueDisplay.textContent = n + '%';
-                riskLabelDisplay.textContent = label;
-                riskValueDisplay.className = `text-5xl font-bold ${color} transition-all duration-200`;
-                riskLabelDisplay.className = `text-2xl font-bold ${color} transition-all duration-200`;
-            }
+    const result = mapRiskPreference(urgencyEl.value, cashflowEl.value);
+    const config = {
+        conservative: { label: 'Conservative', color: 'text-green-600',  value: '20' },
+        moderate:     { label: 'Moderate',     color: 'text-yellow-600', value: '50' },
+        aggressive:   { label: 'Aggressive',   color: 'text-red-600',    value: '80' }
+    };
 
-            // 监听用户滑动
-            slider.addEventListener('input', e => updateRiskDisplay(e.target.value));
-            // 页面加载时初始化一次颜色
-            updateRiskDisplay(slider.value);
-        }
+    labelEl.textContent = config[result].label;
+    labelEl.className   = `text-2xl font-bold ${config[result].color} transition-all duration-200`;
+    resultBox.classList.remove('hidden');
+
+    localStorage.setItem('riskTolerance', config[result].value);
+    localStorage.setItem('riskProfile', result);
+}
+
+document.querySelectorAll('input[name="urgency"], input[name="cashflow"]').forEach(radio => {
+    radio.addEventListener('change', updateRiskDisplay);
+});
+
+// Slider logic (Custom Setup)
+function updateSliderDisplay(value) {
+    const n = parseInt(value);
+    const valEl   = document.getElementById('sliderValueDisplay');
+    const labelEl = document.getElementById('sliderLabelDisplay');
+    if (!valEl || !labelEl) return;
+
+    let label = 'Moderate', color = 'text-yellow-600';
+    if (n <= 33) { label = 'Conservative'; color = 'text-green-600'; }
+    else if (n >= 67) { label = 'Aggressive'; color = 'text-red-600'; }
+
+    valEl.textContent   = n + '%';
+    labelEl.textContent = label;
+    valEl.className     = `text-4xl font-bold ${color} transition-all duration-200`;
+    labelEl.className   = `text-2xl font-bold ${color} transition-all duration-200`;
+
+    localStorage.setItem('riskTolerance', String(n));
+    localStorage.setItem('riskProfile', label.toLowerCase());
+}
+
+const sliderEl = document.getElementById('riskSlider');
+if (sliderEl) {
+    sliderEl.addEventListener('input', e => updateSliderDisplay(e.target.value));
+    updateSliderDisplay(sliderEl.value);
+}
+
 
         // ==========================================
         // B. 权限管理与多货币动态表单渲染
@@ -323,44 +513,159 @@
 
         // ==========================================
         // C. 表单提交控制
-        // ==========================================
-        const form = document.getElementById('dataInputForm');
-        if (form) {
-            form.addEventListener('submit', function (e) {
-                e.preventDefault();
-                
-                const selectedPairs = Array.from(document.querySelectorAll('input[name="currencyPair"]:checked')).map(cb => cb.value);
-                if (selectedPairs.length === 0) {
-                    alert("Please select at least one currency pair for analysis.");
-                    return;
-                }
+const form = document.getElementById('dataInputForm');
 
-                const currencyInputs = [];
-                for (let curr of selectedPairs) {
-                    const amt = document.getElementById(`amount_${curr}`).value;
-                    const prd = document.getElementById(`period_${curr}`).value;
-                    
-                    if (!amt || !prd) {
-                        alert(`Please fill in both amount and period for CNY/${curr}.`);
-                        return;
-                    }
-                    currencyInputs.push({ currency: curr, amount: parseFloat(amt), period: parseInt(prd) });
-                }
+// 保存数据并跳转，抽成独立函数
+function saveAndProceed() {
+    const selectedPairs = Array.from(document.querySelectorAll('input[name="currencyPair"]:checked')).map(cb => cb.value);
+    const currencyInputs = [];
+    selectedPairs.forEach(curr => {
+        currencyInputs.push({
+            currency: curr,
+            amount: parseFloat(document.getElementById(`amount_${curr}`).value),
+            period: parseInt(document.getElementById(`period_${curr}`).value)
+        });
+    });
+    localStorage.setItem("selectedCurrencies", JSON.stringify(selectedPairs));
+    localStorage.setItem("currencyInputs", JSON.stringify(currencyInputs));
+    const fallbackCurr = selectedPairs.includes('MYR') ? 'MYR' : selectedPairs[0];
+    localStorage.setItem("preferredCurrency", fallbackCurr);
+    localStorage.setItem("unsettledAmount", document.getElementById(`amount_${fallbackCurr}`).value);
+    localStorage.setItem("settlementPeriod", document.getElementById(`period_${fallbackCurr}`).value);
+    localStorage.setItem('fx_fromDataInput', 'true');
+    window.location.href = './risk-report.html';
+}
 
-                localStorage.setItem("selectedCurrencies", JSON.stringify(selectedPairs));
-                localStorage.setItem("currencyInputs", JSON.stringify(currencyInputs));
-                
-                const fallbackCurr = selectedPairs.includes('MYR') ? 'MYR' : selectedPairs[0];
-                localStorage.setItem("preferredCurrency", fallbackCurr);
-                localStorage.setItem("unsettledAmount", document.getElementById(`amount_${fallbackCurr}`).value);
-                localStorage.setItem("settlementPeriod", document.getElementById(`period_${fallbackCurr}`).value);
-                
-                if(slider) localStorage.setItem("riskTolerance", slider.value);
-                localStorage.setItem('fx_fromDataInput', 'true');
-window.location.href = './risk-report.html';
-                window.location.href = './risk-report.html';
-            });
+// 打开弹窗的统一入口，mode = 'quick' | 'custom'
+function openExtremeModal(mode, userChoiceText) {
+    const modal = document.getElementById('extremeConfirmModal');
+    const userLabel = document.getElementById('userChoiceLabel');
+    const desc = document.getElementById('extremeModalDesc');
+    const stayBtn = document.getElementById('extremeModalStayBtn');
+
+    // 更新用户选择的标签
+    if (userLabel) userLabel.textContent = userChoiceText;
+
+    if (mode === 'quick') {
+        if (desc) desc.textContent = 'Your Quick Setup answers suggest a higher-risk profile. During extreme volatility, you can let FXGuard override to Conservative, proceed with your original choice, or stay here to configure a Custom risk profile manually.';
+        if (stayBtn) stayBtn.classList.remove('hidden');  // Quick模式显示第三个按钮
+    } else {
+        if (desc) desc.textContent = 'During extreme volatility, non-conservative strategies carry significantly higher tail risk. You can switch to Conservative or proceed with your current choice.';
+        if (stayBtn) stayBtn.classList.add('hidden');  // Custom模式隐藏第三个按钮
+    }
+
+    modal.classList.remove('hidden');
+    modal.classList.add('flex');
+    if (typeof lucide !== 'undefined') lucide.createIcons();
+}
+
+function closeExtremeModal() {
+    const modal = document.getElementById('extremeConfirmModal');
+    modal.classList.add('hidden');
+    modal.classList.remove('flex');
+}
+
+if (form) {
+    form.addEventListener('submit', function (e) {
+        e.preventDefault();
+
+        // 基础校验
+        const selectedPairs = Array.from(document.querySelectorAll('input[name="currencyPair"]:checked')).map(cb => cb.value);
+        if (selectedPairs.length === 0) {
+            alert("Please select at least one currency pair for analysis.");
+            return;
         }
+        for (let curr of selectedPairs) {
+            const amt = document.getElementById(`amount_${curr}`)?.value;
+            const prd = document.getElementById(`period_${curr}`)?.value;
+            if (!amt || !prd) {
+                alert(`Please fill in both amount and period for CNY/${curr}.`);
+                return;
+            }
+        }
+
+        const isExtremeMode = localStorage.getItem('isExtremeMode') === 'true';
+        const isQuickTab = !document.getElementById('panelQuick').classList.contains('hidden');
+
+        if (isExtremeMode && isQuickTab) {
+            // Quick模式：检查问卷结果是否为Conservative
+            const urgencyVal = document.querySelector('input[name="urgency"]:checked')?.value;
+            const cashflowVal = document.querySelector('input[name="cashflow"]:checked')?.value;
+
+            if (!urgencyVal || !cashflowVal) {
+                alert("Please answer both questions before submitting.");
+                return;
+            }
+
+            const mappedProfile = (urgencyVal === 'urgent' || cashflowVal === 'tight')
+                ? 'conservative'
+                : (urgencyVal === 'medium' && cashflowVal === 'normal')
+                    ? 'moderate'
+                    : 'aggressive';
+
+            if (mappedProfile !== 'conservative') {
+                const labelText = mappedProfile === 'aggressive' ? 'Aggressive' : 'Moderate';
+                openExtremeModal('quick', labelText);
+                return; // 等弹窗按钮决定下一步
+            }
+        }
+
+        if (isExtremeMode && !isQuickTab) {
+            // Custom模式：检查滑块值
+            const riskVal = parseInt(localStorage.getItem('riskTolerance') || '50');
+            if (riskVal > 33) {
+                const labelText = riskVal >= 67 ? 'Aggressive' : 'Moderate';
+                openExtremeModal('custom', labelText);
+                return; // 等弹窗按钮决定下一步
+            }
+        }
+
+        // 非极端模式，或已经是Conservative，直接跳转
+        localStorage.removeItem('extremeOverride');
+        saveAndProceed();
+    });
+}
+
+// ── 弹窗按钮逻辑 ──────────────────────────────────────
+
+// 按钮1：Switch to Conservative — 两种模式都有
+document.getElementById('extremeModalSwitchBtn')?.addEventListener('click', () => {
+    localStorage.setItem('riskTolerance', '20');
+    localStorage.setItem('riskProfile', 'conservative');
+    localStorage.setItem('extremeOverride', 'switched_to_conservative');
+    // 同步更新滑块UI（如果用户之前在Custom模式）
+    const slider = document.getElementById('riskSlider');
+    if (slider) { slider.value = '20'; updateSliderDisplay('20'); }
+    closeExtremeModal();
+    saveAndProceed();
+});
+
+// 按钮2：Proceed with my choice — 两种模式都有
+document.getElementById('extremeModalProceedBtn')?.addEventListener('click', () => {
+    localStorage.setItem('extremeOverride', 'ignored_warning');
+    closeExtremeModal();
+    saveAndProceed();
+});
+
+// 按钮3：Stay here & use Custom Setup — 只在Quick模式显示
+document.getElementById('extremeModalStayBtn')?.addEventListener('click', () => {
+    closeExtremeModal();
+    // 切换到Custom Setup Tab，让用户自己调整滑块
+    switchRiskTab('custom');
+    // 滚动到Risk Profile区域，让用户看到滑块
+    document.querySelector('.space-y-6')?.scrollIntoView({ behavior: 'smooth', block: 'center' });
+});
+
+// 弹窗逻辑：坚持自己的选择
+const extremeModalProceedBtn = document.getElementById('extremeModalProceedBtn');
+if (extremeModalProceedBtn) {
+    extremeModalProceedBtn.addEventListener('click', () => {
+        localStorage.setItem('extremeOverride', 'custom_ignored'); // 记录用户无视了警告
+        document.getElementById('extremeConfirmModal').classList.add('hidden');
+        document.getElementById('extremeConfirmModal').classList.remove('flex');
+        saveAndProceed();
+    });
+}
 
         // ==========================================
         // D. 强制唤起右上角控制台 (防止丢失)

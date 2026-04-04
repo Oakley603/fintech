@@ -533,11 +533,44 @@
         lucide.createIcons();
 
         // 数据兜底：如果关键数据缺失，用演示数据填充
-        const unsettledAmount = parseFloat(localStorage.getItem('unsettledAmount')) || 100000;
-        const settlementPeriod = parseInt(localStorage.getItem('settlementPeriod')) || 30;
-        const preferredCurrency = localStorage.getItem('preferredCurrency') || 'MYR';
-        const selectedCurrencies = JSON.parse(localStorage.getItem('selectedCurrencies')) || ['MYR'];
-        const riskTolerance = parseInt(localStorage.getItem('riskTolerance')) || 50;
+       const unsettledAmount = parseFloat(localStorage.getItem('unsettledAmount')) || 100000;
+const settlementPeriod = parseInt(localStorage.getItem('settlementPeriod')) || 30;
+const preferredCurrency = localStorage.getItem('preferredCurrency') || 'MYR';
+const selectedCurrencies = JSON.parse(localStorage.getItem('selectedCurrencies')) || ['MYR'];
+const riskTolerance = parseInt(localStorage.getItem('riskTolerance')) || 50;
+
+// === 第三级熔断响应：检测是否处于极端市场状态 ===
+const isExtremeMode = localStorage.getItem('isExtremeMode') === 'true';
+
+// 如果是极端模式，显示策略页顶部的红色横幅
+if (isExtremeMode) {
+    const strategyBanner = document.getElementById('strategyExtremeBanner');
+    if (strategyBanner) {
+        strategyBanner.classList.remove('hidden');
+        // 更新横幅文字，说明具体发生了什么调整
+        const bannerText = strategyBanner.querySelector('p');
+        if (bannerText) {
+            bannerText.textContent = 'Extreme volatility detected. Normal strategy output suspended. Your risk preference has been adjusted one level more conservative to reduce tail-risk exposure.';
+        }
+    }
+}
+
+// 确定推荐方案
+// 极端模式下：不管用户填了什么，推荐直接写死为90%（Conservative）
+//const isExtremeMode = localStorage.getItem('isExtremeMode') === 'true';
+
+let recommendedRatio;
+if (isExtremeMode) {
+    recommendedRatio = 90;
+} else {
+    recommendedRatio = 70;
+    if (riskTolerance < 33) recommendedRatio = 90;
+    else if (riskTolerance >= 67) recommendedRatio = 30;
+}
+
+let selectedRatio = recommendedRatio;
+
+
 
         // 如果是直接跳转（无数据），在页面最顶部插入一条黄色的提示横幅
         if (!localStorage.getItem('unsettledAmount')) {
@@ -559,13 +592,24 @@
             { id: 'opt_agg', name: 'Aggressive', ratio: 30, desc: 'Maximum upside' }
         ];
 
+// 读取极端模式覆盖记录，决定是否显示策略页横幅及说明
+const extremeOverride = localStorage.getItem('extremeOverride');
+const strategyBanner = document.getElementById('strategyExtremeBanner');
 
-        // 确定推荐方案 (匹配用户偏好)
-        let recommendedRatio = 70;
-        if (riskTolerance < 33) recommendedRatio = 90;
-        else if (riskTolerance >= 67) recommendedRatio = 30;
-
-        let selectedRatio = recommendedRatio; // 默认选中推荐的比例
+if (extremeOverride && strategyBanner) {
+    strategyBanner.classList.remove('hidden');
+    const bannerText = strategyBanner.querySelector('p');
+    if (bannerText) {
+        if (extremeOverride === 'quick') {
+            bannerText.textContent = 'Extreme volatility active. Your Quick Setup result has been overridden to Conservative to protect your capital. Normal strategy ranking is suspended.';
+        } else if (extremeOverride === 'custom_switched') {
+            bannerText.textContent = 'Extreme volatility active. You switched to Conservative strategy. This is the safest choice under current market conditions.';
+        } else if (extremeOverride === 'custom_ignored') {
+            bannerText.innerHTML = '⚠️ Extreme volatility active. You chose to override the system recommendation. <strong>Your decision has been recorded.</strong> FXGuard is not responsible for outcomes under extreme market conditions.';
+        }
+    }
+}
+       
         const strategyContainer = document.getElementById('strategyOptions');
 
         // 渲染三个选项卡片
@@ -580,9 +624,14 @@
                 const pGain = uAmount * 0.03;
                 const pLoss = uAmount * 0.02;
 
-                const cardHtml = `
-                    <div class="relative cursor-pointer border-2 rounded-md p-4 sm:p-6 transition-all ${isSelected ? 'border-[#0a2463] bg-blue-50 shadow-md transform scale-105' : 'border-gray-200 bg-white hover:border-gray-300'}" onclick="selectStrategy(${opt.ratio})">
-                        ${isRecommended ? '<span class="absolute -top-3 left-1/2 -translate-x-1/2 bg-[#0a2463] text-white text-xs font-bold px-3 py-1 rounded-full whitespace-nowrap">Recommended</span>' : ''}
+                const extremeNote = isExtremeMode && isRecommended
+    ? '<span class="absolute -top-3 right-4 bg-red-500 text-white text-[10px] font-bold px-2 py-0.5 rounded-full whitespace-nowrap">Auto-adjusted for extreme market</span>'
+    : '';
+
+const cardHtml = `
+    <div class="relative cursor-pointer border-2 rounded-md p-4 sm:p-6 transition-all ${isSelected ? 'border-[#0a2463] bg-blue-50 shadow-md transform scale-105' : 'border-gray-200 bg-white hover:border-gray-300'}" onclick="selectStrategy(${opt.ratio})">
+        ${isRecommended ? '<span class="absolute -top-3 left-1/2 -translate-x-1/2 bg-[#0a2463] text-white text-xs font-bold px-3 py-1 rounded-full whitespace-nowrap">Recommended</span>' : ''}
+        ${extremeNote}
                         <div class="text-center mb-4 mt-2">
                             <h3 class="text-xl font-bold text-gray-800">${opt.name}</h3>
                             <p class="text-xs text-gray-500 mt-1">${opt.desc}</p>
@@ -902,46 +951,35 @@ multiViewBtn.addEventListener('click', () => {
         const modalRiskPriority = document.getElementById('modalRiskPriority');
         let currentTargetUrl = ''; // 记录当前要跳转的网址
 
-        // 1. 根据 localStorage 里的 riskTolerance 动态判断文案
-        let profileName = "Balanced";
-        let profilePriority = "risk-return balance";
+        // 根据用户当前实际选中的比例，动态生成弹窗文案
+// selectedRatio 在页面上方已定义，用户点击卡片时会更新
+function getProfileFromRatio(ratio) {
+    if (ratio === 90) return { name: 'Conservative', priority: 'capital protection' };
+    if (ratio === 70) return { name: 'Balanced', priority: 'risk-return balance' };
+    return { name: 'Aggressive', priority: 'maximizing upside' };
+}
 
-        // 这里的 riskTolerance 变量已经在页面顶部被获取了
-        if (typeof riskTolerance !== 'undefined') {
-            if (riskTolerance < 33) {
-                profileName = "Conservative";
-                profilePriority = "capital protection";
-            } else if (riskTolerance >= 67) {
-                profileName = "Aggressive";
-                profilePriority = "maximizing upside";
-            }
-        }
-
-        // 把动态文字填入弹窗
-        if (modalRiskProfile) modalRiskProfile.textContent = profileName;
-        if (modalRiskPriority) modalRiskPriority.textContent = profilePriority;
-
-        // 2. 找到所有我们刚刚修改过的 5 个按钮，并加上点击拦截
         const executeButtons = document.querySelectorAll('.external-execute-btn');
-        executeButtons.forEach(btn => {
-            btn.addEventListener('click', function (e) {
-                e.preventDefault(); // 阻止默认的直接跳转
+executeButtons.forEach(btn => {
+    btn.addEventListener('click', function (e) {
+        e.preventDefault();
+        currentTargetUrl = this.getAttribute('data-url');
 
-                // 获取放在 data-url 里的目标链接
-                currentTargetUrl = this.getAttribute('data-url');
+        // 用当前实际选中的比例动态更新弹窗文案
+        const profile = getProfileFromRatio(selectedRatio);
+        if (modalRiskProfile) modalRiskProfile.textContent = profile.name;
+        if (modalRiskPriority) modalRiskPriority.textContent = profile.priority;
 
-                // 显示弹窗
-                executionModal.classList.remove('hidden');
+        executionModal.classList.remove('hidden');
 
-                // 如果是单货币下拉菜单里的按钮，点击后顺便把下拉菜单收起来
-                if (executeDropdown && !executeDropdown.classList.contains('hidden')) {
-                    executeDropdown.classList.add('hidden');
-                    const dropIcon = document.querySelector('#executeBtn i');
-                    if (dropIcon) dropIcon.setAttribute('data-lucide', 'chevron-down');
-                    lucide.createIcons();
-                }
-            });
-        });
+        if (executeDropdown && !executeDropdown.classList.contains('hidden')) {
+            executeDropdown.classList.add('hidden');
+            const dropIcon = document.querySelector('#executeBtn i');
+            if (dropIcon) dropIcon.setAttribute('data-lucide', 'chevron-down');
+            lucide.createIcons();
+        }
+    });
+});
 
         // 3. 取消按钮逻辑
         if (modalCancelBtn) {
