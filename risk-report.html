@@ -184,7 +184,7 @@
                 </li>
             </ul>
         </div>
-<div class="bg-white p-8 rounded-lg shadow-sm border border-gray-200 mb-8">
+<div id="recommendationBox" class="bg-white p-8 rounded-lg shadow-sm border border-gray-200 mb-8">
     <div class="mb-6">
         <h2 class="text-3xl font-extrabold text-[#0A2463] mb-5 flex items-center gap-3">
             <span>📊</span> Current Recommendation: Settle 70%, Keep 30% Exposure
@@ -229,10 +229,14 @@
         </div>
     </div>
 </div>
-        <button id="strategyBtn" class="w-full h-14 bg-[#0a2463] hover:bg-[#1e3a8a] text-white font-bold text-lg rounded-md transition-colors flex items-center justify-center mb-6">
+         <button id="strategyBtn" class="w-full h-14 bg-[#0a2463] hover:bg-[#1e3a8a] text-white font-bold text-lg rounded-md transition-colors flex items-center justify-center mb-3">
     View Recommended Strategy
     <i data-lucide="arrow-right" class="w-5 h-5 ml-2"></i>
 </button>
+<div id="strategyUpgradeHint" class="hidden mb-6 flex items-center gap-2 text-sm text-gray-500 bg-gray-50 border border-gray-200 rounded-md px-4 py-3">
+    <i data-lucide="sparkles" class="w-4 h-4 text-[#0a2463] flex-shrink-0"></i>
+    <span>Want a strategy tailored to your business? <a href="#" onclick="alert('Redirecting to Pricing Page...')" class="text-[#0a2463] font-semibold hover:underline">Upgrade to Pro</a> for fully customized hedging recommendations.</span>
+</div>
     </div>
 
     <!-- 免责声明弹窗 -->
@@ -721,7 +725,31 @@ function renderReportForCurrency(currency, amount, period) {
     if (lossElem) lossElem.textContent = mockLowerBound.toFixed(2);
 }
 
+// ==========================================
+// 推荐方框 & Strategy 提示：根据 tier 控制显示
+// ==========================================
+(function() {
+    const tier = localStorage.getItem('fx_userTier') || 'free';
 
+    // 1. 推荐方框：免费用户上磨砂锁
+    if (tier === 'free') {
+        setTimeout(() => {
+            if (typeof applyFrostedLock === 'function') {
+                applyFrostedLock(
+                    'recommendationBox',
+                    'Unlock Your Personalized Recommendation',
+                    'Upgrade to Basic or Pro to see your tailored hedging strategy'
+                );
+            }
+        }, 200);
+    }
+
+    // 2. Strategy 按钮下提示语：免费 & Basic 用户可见
+    if (tier === 'free' || tier === 'basic') {
+        const hint = document.getElementById('strategyUpgradeHint');
+        if (hint) hint.classList.remove('hidden');
+    }
+})();
 </script>
 
 
