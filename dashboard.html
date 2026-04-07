@@ -166,6 +166,9 @@
                     <strong>Market Insight:</strong> The <span id="insightCurrency" class="font-bold">MYR</span> has <span id="insightTrend">depreciated</span> against CNY by <span id="insightPercent">--</span>% over the past 30 days. Consider hedging to protect against further volatility.
                 </p>
             </div>
+            <p id="rateSourceNote" class="text-xs text-gray-400 mt-2 text-right">
+                Loading live rates...
+            </p>
         </div>
 
 <div class="grid grid-cols-1 lg:grid-cols-3 gap-6 mb-8 mt-8">
@@ -1027,6 +1030,82 @@ document.addEventListener('DOMContentLoaded', () => {
     }
     
     document.addEventListener('DOMContentLoaded', updateRecentStrategyCount);
+
+    // 获取实时汇率 (通过 Vercel API 中转)
+async function fetchLiveRates() {
+    try {
+        // 这里直接调用我们在第一步写的接口，解决了 HTTPS 限制
+        const response = await fetch('/api/rates');
+        const data = await response.json();
+        
+        if (!data.success) {
+            console.log('API error:', data.error);
+            return null;
+        }
+        
+        // 交叉计算：CNY为基准
+        const rates = data.rates;
+        const cnyMyr = (rates.MYR / rates.CNY).toFixed(4);
+        const cnySgd = (rates.SGD / rates.CNY).toFixed(4);
+        const cnyThb = (rates.THB / rates.CNY).toFixed(4);
+        
+        return {
+            MYR: parseFloat(cnyMyr),
+            SGD: parseFloat(cnySgd),
+            THB: parseFloat(cnyThb),
+            timestamp: data.timestamp
+        };
+        
+    } catch (error) {
+        console.log('Fetch failed, using fallback rates');
+        return null;
+    }
+}
+
+// 更新页面显示
+async function updateRateDisplay(currency) {
+    const liveRates = await fetchLiveRates();
+    
+    if (liveRates && liveRates[currency]) {
+        const rate = liveRates[currency];
+        
+        // 更新大数字显示
+        document.getElementById('currentRateDisplay').textContent = rate.toFixed(4);
+        
+        // 更新按钮的data-baserate属性（让图表用真实数据）
+        document.querySelectorAll('.live-tab-btn').forEach(btn => {
+            const curr = btn.dataset.currency;
+            if (liveRates[curr]) {
+                btn.dataset.baserate = liveRates[curr];
+            }
+        });
+        
+        // 加一行小字显示数据来源和时间
+        const updateTime = new Date(liveRates.timestamp * 1000).toLocaleString();
+        const sourceNote = document.getElementById('rateSourceNote');
+        if (sourceNote) {
+            sourceNote.textContent = `Updated: ${updateTime} · Source: Fixer.io`;
+        }
+        
+    } else {
+        // API失败时保持原有模拟数据，不显示错误
+        console.log('Using existing simulated rates');
+        const sourceNote = document.getElementById('rateSourceNote');
+        if (sourceNote) {
+            sourceNote.textContent = `Using historical simulated rates`;
+        }
+    }
+}
+
+// 页面加载时执行
+document.addEventListener('DOMContentLoaded', async () => {
+    // 获取当前选中的货币
+    const activeCurrency = document.querySelector('.live-tab-btn.bg-white')?.dataset.currency || 'MYR';
+    await updateRateDisplay(activeCurrency);
+    
+    // 每小时更新一次（Fixer免费版限制）
+    setInterval(() => updateRateDisplay(activeCurrency), 3600000);
+});
 </script>
 
 </body>
