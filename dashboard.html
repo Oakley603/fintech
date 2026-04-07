@@ -1034,15 +1034,25 @@ document.addEventListener('DOMContentLoaded', () => {
     // 获取实时汇率 (通过 Vercel API 中转)
 async function fetchLiveRates() {
     try {
-        // 这里直接调用我们在第一步写的接口，解决了 HTTPS 限制
-        const response = await fetch('/api/rates');
-        const data = await response.json();
+        // 这里替换成你真实的 Fixer API Key
+        const FIXER_API_KEY = 'be9721288d884843ac4ba172fe77debe'; 
+        
+        // 目标 HTTP 地址
+        const targetUrl = `http://data.fixer.io/api/latest?access_key=${FIXER_API_KEY}&symbols=CNY,MYR,SGD,THB`;
+        
+        // 使用免费的公共代理服务将其包装成 HTTPS
+        const proxyUrl = `https://api.allorigins.win/get?url=${encodeURIComponent(targetUrl)}`;
+        
+        const response = await fetch(proxyUrl);
+        const proxyData = await response.json();
+        
+        // 代理服务会把真实的数据变成字符串塞在 contents 里，需要解析一次
+        const data = JSON.parse(proxyData.contents);
         
         if (!data.success) {
             console.log('API error:', data.error);
             return null;
         }
-        
         // 交叉计算：CNY为基准
         const rates = data.rates;
         const cnyMyr = (rates.MYR / rates.CNY).toFixed(4);
