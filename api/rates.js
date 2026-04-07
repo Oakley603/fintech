@@ -1,30 +1,16 @@
-export default async function handler(req, res) {
-  // 允许跨域
-  res.setHeader('Access-Control-Allow-Origin', '*');
-  
-  try {
-    const response = await fetch(
-      'https://api.exchangerate.host/latest?base=CNY&symbols=MYR,SGD,THB'
-    );
-    const data = await response.json();
+module.exports = async function (req, res) {
+    const API_KEY = process.env.FIXER_API_KEY;
     
-    res.status(200).json({
-      success: true,
-      rates: data.rates,
-      timestamp: new Date().toISOString()
-    });
-    
-  } catch (error) {
-    // 失败时返回备用数据
-    res.status(200).json({
-      success: false,
-      rates: {
-        MYR: 0.6482,
-        SGD: 0.1852,
-        THB: 4.4940
-      },
-      timestamp: new Date().toISOString(),
-      note: 'fallback data'
-    });
-  }
-}
+    try {
+        const response = await fetch(
+            `http://data.fixer.io/api/latest?access_key=${API_KEY}&symbols=CNY,MYR,SGD,THB`
+        );
+        const data = await response.json();
+        
+        // 成功时返回数据
+        res.status(200).json(data);
+    } catch (error) {
+        // 失败时返回报错，防止页面卡死
+        res.status(500).json({ success: false, message: "Fetch failed" });
+    }
+};
