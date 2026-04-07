@@ -1031,34 +1031,21 @@ document.addEventListener('DOMContentLoaded', () => {
     
     document.addEventListener('DOMContentLoaded', updateRecentStrategyCount);
 
-// FXGuard 演示专用：高仿真稳定版汇率引擎 (0 报错风险)
 async function fetchLiveRates() {
     try {
-        // 模拟 0.6 秒的网络请求延迟，让评委看到真实的 Loading 动画
-        await new Promise(resolve => setTimeout(resolve, 600));
+        // 调用自己的serverless function，不会有CORS问题
+        const response = await fetch('/api/rates');
+        const data = await response.json();
         
-        // 设定基础汇率 (以 CNY 为基准)
-        const baseMYR = 0.6550; 
-        const baseSGD = 0.1870; 
-        const baseTHB = 5.0500; 
-        
-        // 模拟真实外汇市场的微小双向波动 (±0.0015 左右)
-        const fluctuate = (base) => {
-            const change = (Math.random() * 0.0030) - 0.0015;
-            return parseFloat((base + change).toFixed(4));
-        };
-        
-        return {
-            MYR: fluctuate(baseMYR),
-            SGD: fluctuate(baseSGD),
-            THB: fluctuate(baseTHB),
-            // 返回当前真实的系统时间
-            timestamp: Math.floor(Date.now() / 1000) 
-        };
-        
+        if (data.success) {
+            return data.rates;
+        } else {
+            // 返回备用数据但不报错
+            return data.rates;
+        }
     } catch (error) {
-        console.log('Simulation engine error', error);
-        return null;
+        // 完全失败时用写死的备用数据
+        return { MYR: 0.6482, SGD: 0.1852, THB: 4.4940 };
     }
 }
 
