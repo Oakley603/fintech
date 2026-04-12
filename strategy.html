@@ -125,7 +125,7 @@
         </p>
     </div>
     <div class="mb-8">
-        <h1 class="text-4xl font-bold text-[#0a2463] mb-3">Recommended Hedging Strategy</h1>
+        <h1 class="text-4xl font-bold text-[#0a2463] mb-3">Scenario Analysis: Settlement Options</h1>
         <p class="text-gray-600 text-lg">
             Based on your risk profile and market conditions, here's our model-based recommendation
         </p>
@@ -171,11 +171,10 @@
             </div>
             <div class="space-y-3 text-gray-700 flex-1">
                 <p class="flex items-center gap-2"><i data-lucide="pie-chart" class="w-5 h-5 text-red-500"></i>
-                    <span class="font-bold w-32 sm:w-40 flex-shrink-0">Recommended Ratio:</span> 70% Settlement
+                    <span class="font-bold w-32 sm:w-40 flex-shrink-0">Recommended Ratio:</span> Scenario A: 70% Settlement
                 </p>
                 <p class="flex items-center gap-2"><i data-lucide="zap" class="w-5 h-5 text-red-500"></i> <span
-                        class="font-bold w-32 sm:w-40 flex-shrink-0">Action:</span> Prioritize execution, complete
-                    this week.</p>
+                        class="font-bold w-32 sm:w-40 flex-shrink-0">Action:</span> Model suggests elevated risk this week. Timing is at your discretion.</p>
                 <p class="flex items-center gap-2"><i data-lucide="shield" class="w-5 h-5 text-red-500"></i> <span
                         class="font-bold w-32 sm:w-40 flex-shrink-0">Exposure Rule:</span> Keep 30% exposure, set
                     alert to 1.76.</p>
@@ -304,16 +303,15 @@
             </div>
             <div class="flex-1">
                 <h3 class="text-xl font-bold text-[#0a2463] mb-2">
-                    Execute Partial Settlement
+                    Option: Partial Settlement
                 </h3>
                 <p class="text-gray-700 mb-3">
                     Convert and lock in the current exchange rate for <span id="step1Hedged">--</span> <span
                         class="currency-label font-bold">MYR</span> (<span id="step1Ratio">--</span>% of exposure).
                 </p>
                 <div class="bg-gray-100 p-4 rounded-sm border-l-4 border-[#0a2463]">
-                    <p class="text-sm font-semibold text-gray-700 mb-1">Action Required:</p>
-                    <p class="text-sm text-gray-600">Execute settlement via platforms like Wise, PingPong, or
-                        Payoneer to secure the current rate immediately.</p>
+                    <p class="text-sm font-semibold text-gray-700 mb-1">Action Recommendations:</p>
+                    <p class="text-sm text-gray-600">If you choose to settle now, platforms like Wise, PingPong, or Payoneer can be used for execution.</p>
                 </div>
             </div>
         </div>
@@ -336,7 +334,7 @@
                         class="currency-label font-bold">MYR</span> (<span id="step2Ratio">--</span>% of exposure).
                 </p>
                 <div class="bg-gray-100 p-4 rounded-sm border-l-4 border-[#0a2463]">
-                    <p class="text-sm font-semibold text-gray-700 mb-1">Action Required:</p>
+                    <p class="text-sm font-semibold text-gray-700 mb-1">Action Recommendations:</p>
                     <p class="text-sm text-gray-600">Set up rate alerts for favorable conversion opportunities over
                         the next <span id="step2Days">30</span> days.</p>
                 </div>
@@ -354,18 +352,16 @@
     <ul class="space-y-3 text-gray-700">
         <li class="flex items-start gap-3">
             <span class="text-green-600 font-bold text-xl mt-1">✓</span>
-            <span><strong>Guaranteed minimum:</strong> <span id="resultRatio">--</span>% of exposure is protected
-                from depreciation.</span>
+            <span><strong>Model estimates:</strong> <span id="resultRatio">--</span>% of exposure is protected
+                under current volatility assumptions.</span>
         </li>
         <li class="flex items-start gap-3">
             <span class="text-green-600 font-bold text-xl mt-1">✓</span>
-            <span><strong>Upside potential:</strong> Remaining <span id="resultUnhedged">--</span>% can benefit if
-                rates improve.</span>
+            <span><strong>Upside potential:</strong> Remaining <span id="resultUnhedged">--</span>% retains potential upside if rates improve.</span>
         </li>
         <li class="flex items-start gap-3">
             <span class="text-green-600 font-bold text-xl mt-1">✓</span>
-            <span><strong>Business certainty:</strong> Predictable cash flow for inventory and operational
-                planning.</span>
+            <span><strong>Based on your stated risk tolerance of</strong>.</span>
         </li>
     </ul>
 </div>
@@ -782,11 +778,10 @@ if (backButton) {
 
                 lucide.createIcons();
                 
-                return; // 【新增这一行】：非常关键！弹出提示后立刻停止运行，防止走到最下面的跳转
+                return; 
             }
-        } // 【修复这个缺少的括号】：闭合 if (currentTier === 'free') 
+        } 
         
-        // 如果检查通过，允许返回
         window.location.href = 'risk-report.html';
     });
 }
@@ -801,7 +796,7 @@ if (backButton) {
                 // 2. 创建新的活动对象 (使用当前页面的变量)
                 const newActivity = {
                     title: 'Risk Assessment Completed',
-                    detail: `${selectedRatio}% hedging recommended for ${unsettledAmount.toLocaleString()} ${preferredCurrency}`,
+                    detail: `Scenario A: (${selectedRatio}% settlement) generated for ${unsettledAmount.toLocaleString()} ${preferredCurrency}`,
                     time: 'Just now'
                 };
 
@@ -848,12 +843,10 @@ multiViewBtn.addEventListener('click', () => {
     multiViewBtn.className = 'px-5 py-2 text-sm font-bold rounded-md bg-white text-[#0a2463] shadow-sm transition-all focus:outline-none flex items-center gap-1';
     singleViewBtn.className = 'px-5 py-2 text-sm font-bold rounded-md text-gray-500 hover:text-gray-700 transition-all focus:outline-none';
     
-    // 👇 先生成横幅
     if (typeof showMultiCurrencyBanner === 'function') {
         showMultiCurrencyBanner();
     }
     
-    // 👇 再过滤卡片（确保只显示用户选择的货币）
     if (typeof filterMultiCurrencyCards === 'function') {
         filterMultiCurrencyCards();
     }
@@ -866,7 +859,7 @@ multiViewBtn.addEventListener('click', () => {
     // 重新渲染新插入的图标
     lucide.createIcons();
 });
-    }  // 👈 闭合外层 if
+    }  
 
 
         // ================== 更新：多货币视图计算逻辑 (包含剩余敞口) ==================
@@ -1105,7 +1098,7 @@ Personalized strategy recommendations: Upgrade to the Basic or Professional vers
 </script>
 
 <script>
-        lucide.createIcons(); // 👈 统一在最后调用一次就够了
+        lucide.createIcons();
 </script>
 </body>
 
