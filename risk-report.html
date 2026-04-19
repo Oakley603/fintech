@@ -216,18 +216,148 @@
         </div>
     </div>
 
-    <div class="border-t border-gray-200 pt-4 mt-6">
-        <button id="toggleAnalysisBtn" class="text-sm text-gray-500 hover:text-[#0A2463] font-medium flex items-center gap-1 transition-colors outline-none">
-            View Analysis Basis 
-            <svg id="analysisChevron" class="w-4 h-4 transition-transform duration-200" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7"></path></svg>
-        </button>
-        <div id="analysisContent" class="hidden mt-4 bg-gray-50 p-5 rounded text-xs text-gray-500 space-y-3 border border-gray-100 shadow-inner">
-            <p><span class="font-semibold text-gray-700">Current Volatility (σ):</span> 4.2% (based on 30-day historical data)</p>
-            <p><span class="font-semibold text-gray-700">Confidence Interval:</span> 80% probability exchange rate will fluctuate within [1.72, 1.78]</p>
-            <p><span class="font-semibold text-gray-700">Model:</span> GJR-GARCH, accounting for asymmetric effects of negative shocks</p>
-            <p><span class="font-semibold text-gray-700">Data Source:</span> Bank of China official exchange rates, updated to March 23, 2026</p>
-        </div>
+<div class="border-t border-gray-200 pt-4 mt-6">
+    <button id="toggleBasis" class="text-sm text-gray-500 hover:text-[#0A2463] font-medium flex items-center gap-1 transition-colors outline-none">
+        <span id="btnText">View Analysis Basis</span>
+        <svg id="analysisChevron" class="w-4 h-4 transition-transform duration-200" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7"></path></svg>
+    </button>
+</div>
+
+<div id="analysisBasis" class="mt-4 p-6 bg-blue-50 border border-blue-200 rounded-sm hidden">
+
+  <h4 class="text-lg font-bold text-[#0a2463] mb-4">How This Analysis Was Generated</h4>
+  
+  <div class="mb-6">
+    <p class="text-sm font-semibold text-gray-700 mb-2">Step 1 — Volatility Estimation (GJR-GARCH)</p>
+    <div class="bg-white border border-gray-200 rounded p-4 font-mono text-xs text-gray-700 leading-relaxed">
+      <p>σ²(t) = ω + α·ε²(t-1) + γ·ε²(t-1)·I[ε(t-1) &lt; 0] + β·σ²(t-1)</p>
+      <p class="mt-2 text-gray-500">where I[·] = 1 if previous shock was negative (depreciation)</p>
     </div>
+    <p class="text-xs text-gray-500 mt-2">
+      Parameters estimated on <span id="obsCount">3,731</span> trading days of PBoC official CNY mid-rates.
+      Residuals follow a Student's t-distribution to capture fat tails.
+    </p>
+  </div>
+
+  <div class="mb-6">
+    <p class="text-sm font-semibold text-gray-700 mb-2">Step 2 — Monte Carlo Simulation</p>
+    <p class="text-xs text-gray-600 leading-relaxed">
+      Using the estimated conditional volatility, FXGuard simulates 10,000 possible exchange rate 
+      paths over your selected horizon. Each path is drawn from the fitted t-distribution. 
+      The 80% confidence interval is the range containing the central 80% of all simulated outcomes.
+    </p>
+    <p class="text-xs text-gray-500 mt-1">
+      Reference: Hull, J.C. (2018). <em>Options, Futures, and Other Derivatives</em>, 10th ed. Pearson.
+    </p>
+  </div>
+
+  <div class="mb-6">
+    <p class="text-sm font-semibold text-gray-700 mb-2">Step 3 — Settlement Ratio Calculation (VaR Framework)</p>
+    <p class="text-xs text-gray-600 leading-relaxed">
+      Your stated risk tolerance defines a maximum acceptable loss (L) on unsettled exposure. 
+      FXGuard finds the minimum settlement ratio R such that:
+    </p>
+    <div class="bg-white border border-gray-200 rounded p-4 font-mono text-xs text-gray-700 mt-2">
+      <p>P( loss on (1−R)·E &gt; L ) ≤ 1 − confidence level</p>
+    </div>
+    <p class="text-xs text-gray-500 mt-2">
+      The recommended ratio is the smallest R satisfying this constraint — 
+      no more is settled than necessary to bring your exposure within tolerance.
+      Reference: Jorion, P. (2006). <em>Value at Risk</em>, 3rd ed. McGraw-Hill.
+    </p>
+  </div>
+
+  <div class="mb-6">
+    <p class="text-sm font-semibold text-gray-700 mb-2">Step 4 — Tail Risk (CVaR)</p>
+    <p class="text-xs text-gray-600 leading-relaxed">
+      Beyond VaR, FXGuard reports CVaR (Conditional Value at Risk) — the average loss 
+      in the worst 10% of simulated scenarios. CVaR gives a more complete picture of 
+      tail risk than VaR alone.
+    </p>
+    <p class="text-xs text-gray-500 mt-1">
+      Reference: Rockafellar, R.T. & Uryasev, S. (2000). 
+      <em>Optimization of Conditional Value-at-Risk</em>. Journal of Risk, 2(3), 21–41.
+    </p>
+  </div>
+
+  <div class="border-t border-blue-200 pt-4">
+    <p class="text-sm font-semibold text-gray-700 mb-3">Current Model Parameters</p>
+    <div class="grid grid-cols-2 gap-3 text-xs">
+      <div class="bg-white rounded p-3 border border-gray-200">
+        <p class="text-gray-500">Volatility Model</p>
+        <p class="font-semibold text-gray-800">GJR-GARCH(1,1,1)</p>
+      </div>
+      <div class="bg-white rounded p-3 border border-gray-200">
+        <p class="text-gray-500">Error Distribution</p>
+        <p class="font-semibold text-gray-800">Student's t</p>
+      </div>
+      <div class="bg-white rounded p-3 border border-gray-200">
+        <p class="text-gray-500">Simulation Paths</p>
+        <p class="font-semibold text-gray-800">10,000</p>
+      </div>
+      <div class="bg-white rounded p-3 border border-gray-200">
+        <p class="text-gray-500">Confidence Level</p>
+        <p class="font-semibold text-gray-800">80%</p>
+      </div>
+      <div class="bg-white rounded p-3 border border-gray-200">
+        <p class="text-gray-500">Data Source</p>
+        <p class="font-semibold text-gray-800">PBoC Official Mid-rates</p>
+      </div>
+      <div class="bg-white rounded p-3 border border-gray-200">
+        <p class="text-gray-500">Last Updated</p>
+        <p class="font-semibold text-gray-800">March 23, 2026</p>
+      </div>
+    </div>
+  </div> 
+
+</div>
+
+<script>
+// 获取元素：注意这里的 ID 必须和上方 HTML 中的 ID 完全对应
+const toggleBtn = document.getElementById('toggleBasis');
+const btnText = document.getElementById('btnText'); 
+const chevron = document.getElementById('analysisChevron'); 
+const panel = document.getElementById('analysisBasis');
+
+// 1. 按钮点击逻辑
+toggleBtn.addEventListener('click', function(e) {
+    e.stopPropagation(); 
+    const isHidden = panel.classList.contains('hidden');
+    
+    // 切换面板显示/隐藏
+    panel.classList.toggle('hidden');
+    
+    // 更新文字和箭头方向
+    if (isHidden) {
+        btnText.textContent = 'Hide Analysis Basis';
+        chevron.style.transform = 'rotate(180deg)'; // 箭头翻转
+    } else {
+        btnText.textContent = 'View Analysis Basis';
+        chevron.style.transform = 'rotate(0deg)'; // 箭头恢复
+    }
+});
+
+// 2. 蓝色方框（面板）点击逻辑：点击任何区域自动收回
+panel.addEventListener('click', function() {
+    if (!this.classList.contains('hidden')) {
+        this.classList.add('hidden'); 
+        btnText.textContent = 'View Analysis Basis'; 
+        chevron.style.transform = 'rotate(0deg)'; 
+    }
+});
+</script>
+
+  <!-- 免责声明 -->
+  <div class="mt-4 p-3 bg-yellow-50 border border-yellow-200 rounded text-xs text-gray-600">
+    <strong>Model Limitations:</strong> GJR-GARCH models are calibrated on historical data and 
+    assume that past volatility patterns are informative about future risk. During structural breaks 
+    (e.g., sudden central bank interventions, geopolitical shocks), model accuracy may decrease. 
+    All outputs are probabilistic estimates, not guarantees. See our 
+    <a href="#" class="text-blue-600 underline">Circuit Breaker Policy</a> for how FXGuard 
+    handles extreme market conditions.
+  </div>
+
+</div>
 </div>
          <button id="strategyBtn" class="w-full h-14 bg-[#0a2463] hover:bg-[#1e3a8a] text-white font-bold text-lg rounded-md transition-colors flex items-center justify-center mb-3">
     View Recommended Strategy
